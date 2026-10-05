@@ -35,3 +35,6 @@ frontend/.angular/
 # AWS CLI installer leftovers
 /aws/
 /awscliv2.zip
+
+# Real (dataset) prescription images - not synthetic, keep out of the public repo
+/Samples Prescriptions/
