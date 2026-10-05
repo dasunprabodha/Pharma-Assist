@@ -1,0 +1,81 @@
+main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: 1.9rem;
+}
+
+.who {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.problem {
+  line-height: 1.5;
+}
+
+.disclaimer {
+  padding: 8px 12px;
+  border-left: 4px solid var(--warn);
+  background: var(--warn-bg);
+}
+
+.config {
+  margin-top: 28px;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.config-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.config h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+}
+
+li {
+  padding: 6px 0 6px 26px;
+  position: relative;
+  overflow-wrap: anywhere;
+}
+
+li::before {
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+li.ok::before { content: "✓"; color: var(--ok); }
+li.warn::before { content: "!"; color: var(--warn); }
+li.bad::before { content: "✗"; color: var(--bad); }
+p.bad { color: var(--bad); }
+
+button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+}
+
+code {
+  font-size: 0.9em;
+}

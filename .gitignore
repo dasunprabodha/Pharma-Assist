@@ -1,0 +1,33 @@
+# Secrets - never commit
+.env
+.env.*
+!.env.example
+*.pem
+.aws/
+
+# Runtime output
+logs/*
+!logs/.gitkeep
+
+# Private / real samples must never be committed
+samples/private/
+
+# Backend (Maven)
+backend/target/
+
+# Frontend (Angular)
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Student's own coursework documents (kept locally, not part of the source)
+/*.pdf
+/*.docx
+/*.pptx
+/CLAUDE(1).md
