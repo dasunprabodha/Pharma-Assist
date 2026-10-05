@@ -28,6 +28,12 @@ plus a dashboard, history and reference-data views. Feature 2 (dispensing check)
 | **Stock & rules** | Read-only view of the simulated stock list and interaction rules. |
 | **Settings** | Whether AWS credentials, region and model ID are configured; **Test connection** sends one tiny message to the model. |
 
+### Design documents
+
+- [Architecture](docs/architecture.md) – diagram, components, data flow and failure paths
+- [Feasibility study (draft)](docs/feasibility.md) – technical, data, skills, time, privacy (PDPA), benefits, limitations, risks, costs, adoption
+- Cost estimate: `python3 scripts/cost_estimate.py` (Python 3 standard library; reads `logs/usage.csv`; `--help` lists the settings)
+
 ## Professional and problem
 
 "Pharmacist A" (declared pseudonym), Registered Pharmacist at Dulnitha Pharmacy, Kottawa – an independent
