@@ -1,15 +1,14 @@
 package lk.sliit.prescription.tools;
 
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import javax.imageio.ImageIO;
+import java.util.ArrayList;
+import java.util.List;
 import lk.sliit.prescription.config.AppConfig;
 import lk.sliit.prescription.config.BedrockClients;
+import lk.sliit.prescription.errors.InvalidImageError;
+import lk.sliit.prescription.image.ImageUtils;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.ContentBlock;
@@ -24,12 +23,10 @@ import software.amazon.awssdk.services.bedrockruntime.model.Message;
  * Early accuracy check (Week 1): sends one sample photo to the configured model and prints the raw
  * output, to see whether Amazon Nova reads the handwriting well enough before building the full UI.
  *
- * Run from backend/ (JPG or PNG; use synthetic or redacted samples only):
+ * Run from backend/ (JPG, PNG, WEBP or PDF; use synthetic or redacted samples only):
  *   mvn -q compile exec:java -Dexec.mainClass=lk.sliit.prescription.tools.TrySample -Dexec.args="../samples/rx01.jpg"
  */
 public final class TrySample {
-
-    private static final int MAX_SIDE_PX = 1600;
 
     // Week 2 moves this into Extractor and adds the forced record_prescription tool for structured output.
     static final String PROMPT = """
@@ -44,10 +41,23 @@ public final class TrySample {
             age or doctor details - never include them in the output. If the image is not a prescription or nothing \
             is readable, return {"items": [], "readable": false}.""";
 
+    private static List<ContentBlock> content(List<byte[]> pages) {
+        List<ContentBlock> blocks = new ArrayList<>();
+        for (byte[] jpeg : pages) {
+            blocks.add(ContentBlock.fromImage(ImageBlock.builder()
+                    .format(ImageFormat.JPEG)
+                    .source(ImageSource.fromBytes(SdkBytes.fromByteArray(jpeg)))
+                    .build()));
+        }
+        blocks.add(ContentBlock.fromText(PROMPT));
+        return blocks;
+    }
+
     public static void main(String[] args) throws IOException {
+        // Prints the model's raw text (no forced tool), so the reading quality is visible as-is.
         ToolSupport.quietLogging();
         if (args.length != 1) {
-            System.out.println("Usage: TrySample <path-to-photo.jpg|png>");
+            System.out.println("Usage: TrySample <path-to-file.jpg|png|webp|pdf>");
             System.exit(2);
         }
         Path photo = Path.of(args[0]);
@@ -55,9 +65,17 @@ public final class TrySample {
             System.out.println("ERROR file not found: " + photo.toAbsolutePath());
             System.exit(2);
         }
-        byte[] jpeg = toCleanJpeg(photo);
+        List<byte[]> pages;
+        try {
+            pages = ImageUtils.preparePages(photo.getFileName().toString(), Files.readAllBytes(photo));
+        } catch (InvalidImageError e) {
+            System.out.println("ERROR " + e.getMessage());
+            System.exit(2);
+            return;
+        }
         ToolSupport.printConfig();
-        System.out.println("Image:    " + photo.getFileName() + " (" + jpeg.length / 1024 + " KB after resize, metadata stripped)");
+        System.out.println("File:     " + photo.getFileName() + " (" + pages.size() + " page(s), "
+                + pages.stream().mapToInt(p -> p.length).sum() / 1024 + " KB after resize, metadata stripped)");
 
         try (BedrockRuntimeClient client = BedrockClients.create()) {
             long start = System.currentTimeMillis();
@@ -65,12 +83,7 @@ public final class TrySample {
                     .modelId(AppConfig.modelId())
                     .messages(Message.builder()
                             .role(ConversationRole.USER)
-                            .content(
-                                    ContentBlock.fromImage(ImageBlock.builder()
-                                            .format(ImageFormat.JPEG)
-                                            .source(ImageSource.fromBytes(SdkBytes.fromByteArray(jpeg)))
-                                            .build()),
-                                    ContentBlock.fromText(PROMPT))
+                            .content(content(pages))
                             .build())
                     .inferenceConfig(c -> c.maxTokens(1000).temperature(0f)));
             long elapsed = System.currentTimeMillis() - start;
@@ -88,27 +101,4 @@ public final class TrySample {
         }
     }
 
-    /**
-     * Decodes the photo and re-encodes it as a plain RGB JPEG, which drops all EXIF/GPS metadata,
-     * resizing so the longest side is at most 1600 px. (Week 2 ImageUtils adds EXIF orientation and WEBP.)
-     */
-    static byte[] toCleanJpeg(Path photo) throws IOException {
-        BufferedImage source = ImageIO.read(photo.toFile());
-        if (source == null) {
-            throw new IOException("Not a readable JPG/PNG image: " + photo);
-        }
-        double scale = Math.min(1.0, (double) MAX_SIDE_PX / Math.max(source.getWidth(), source.getHeight()));
-        int width = (int) Math.round(source.getWidth() * scale);
-        int height = (int) Math.round(source.getHeight() * scale);
-
-        BufferedImage rgb = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = rgb.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        g.drawImage(source, 0, 0, width, height, java.awt.Color.WHITE, null);
-        g.dispose();
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ImageIO.write(rgb, "jpg", out);
-        return out.toByteArray();
-    }
 }

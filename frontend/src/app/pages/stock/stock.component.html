@@ -1,0 +1,82 @@
+<div class="page-head">
+  <div>
+    <h1>Stock &amp; rules</h1>
+    <p>Reference data used to check drug names. Feature 2 (Week 3) uses it for the dispensing checklist.</p>
+  </div>
+</div>
+
+<div class="alert warn">
+  <app-icon name="alert" />
+  <div>
+    <div class="title">Simulated data</div>
+    <p>Brand names are used for realism; quantities are invented. The rules are textbook examples, <strong>not a clinical database</strong>.</p>
+  </div>
+</div>
+
+<section class="card">
+  <div class="toolbar">
+    <div class="segmented" role="tablist">
+      <button type="button" role="tab" [class.on]="tab() === 'stock'" (click)="tab.set('stock')">Stock list ({{ stock().length }})</button>
+      <button type="button" role="tab" [class.on]="tab() === 'rules'" (click)="tab.set('rules')">Interaction rules ({{ rules().length }})</button>
+    </div>
+    <label class="search">
+      <app-icon name="search" [size]="16" />
+      <input class="input" type="search" [placeholder]="tab() === 'stock' ? 'Search brand, generic or class' : 'Search drug or warning'"
+             [ngModel]="query()" (ngModelChange)="query.set($event)" aria-label="Search" />
+    </label>
+    @if (tab() === 'stock') {
+      <label class="check"><input type="checkbox" [ngModel]="inStockOnly()" (ngModelChange)="inStockOnly.set($event)" /> In stock only</label>
+      <span class="muted small push">{{ outOfStock() }} out of stock</span>
+    }
+  </div>
+
+  @if (tab() === 'stock') {
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th>ID</th><th>Brand</th><th>Generic</th><th>Strength</th><th>Form</th><th>Class</th><th>Status</th><th class="num">On hand</th></tr></thead>
+        <tbody>
+          @for (r of filteredStock(); track r.item_id) {
+            <tr>
+              <td class="muted"><code>{{ r.item_id }}</code></td>
+              <td><strong>{{ r.brand_name }}</strong></td>
+              <td>{{ r.generic_name }}</td>
+              <td>{{ r.strength }}</td>
+              <td>{{ r.dosage_form }}</td>
+              <td class="muted">{{ r.therapeutic_class }}</td>
+              <td>
+                @if (r.in_stock === 'yes') {
+                  <span class="badge good"><app-icon name="check" [size]="12" /> In stock</span>
+                } @else {
+                  <span class="badge bad"><app-icon name="x" [size]="12" /> Out of stock</span>
+                }
+              </td>
+              <td class="num">{{ (+r.quantity_on_hand).toLocaleString() }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="8" class="muted center">No matching items.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th>ID</th><th>Type</th><th>Drug / class A</th><th>Drug / class B</th><th>Severity</th><th>Warning</th></tr></thead>
+        <tbody>
+          @for (r of filteredRules(); track r.rule_id) {
+            <tr>
+              <td class="muted"><code>{{ r.rule_id }}</code></td>
+              <td>{{ r.rule_type.replace('_', ' ') }}</td>
+              <td>{{ r.item_a }}</td>
+              <td>{{ r.item_b }}</td>
+              <td><span [class]="'badge ' + severityClass(r.severity)">{{ r.severity }}</span></td>
+              <td>{{ r.warning_message }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="muted center">No matching rules.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

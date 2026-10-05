@@ -31,3 +31,7 @@ frontend/.angular/
 /*.docx
 /*.pptx
 /CLAUDE(1).md
+
+# AWS CLI installer leftovers
+/aws/
+/awscliv2.zip

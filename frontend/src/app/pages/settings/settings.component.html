@@ -1,0 +1,88 @@
+<div class="page-head">
+  <div>
+    <h1>Settings</h1>
+    <p>AWS configuration status. Values come from <code>.env</code> and the AWS CLI profile – edit them there and restart the backend.</p>
+  </div>
+</div>
+
+@if (store.backendDown()) {
+  <div class="alert bad">
+    <app-icon name="error" />
+    <div><div class="title">Backend not reachable</div><p>Start it with <code>mvn spring-boot:run</code> in <code>backend/</code>.</p></div>
+  </div>
+}
+
+<div class="grid">
+  <section class="card">
+    <div class="card-head">
+      <div><h2>Amazon Bedrock</h2><div class="sub">Credentials are never shown – only whether they were found.</div></div>
+      <button type="button" class="btn" (click)="store.refresh()"><app-icon name="refresh" [size]="16" /> Re-check</button>
+    </div>
+    @if (store.status(); as s) {
+      <ul class="checks">
+        <li>
+          <span class="state" [class.ok]="s.credentials_found" [class.bad]="!s.credentials_found">
+            <app-icon [name]="s.credentials_found ? 'check' : 'x'" [size]="14" />
+          </span>
+          <div>
+            <div class="k">AWS credentials</div>
+            <div class="v">
+              @if (s.credentials_found) { Found{{ s.profile ? ' – profile ' + s.profile : ' – default chain' }} }
+              @else { Not found – run <code>aws configure --profile prescription-reader</code> }
+            </div>
+          </div>
+        </li>
+        <li>
+          <span class="state" [class.ok]="s.region_set" [class.warn]="!s.region_set"><app-icon [name]="s.region_set ? 'check' : 'alert'" [size]="14" /></span>
+          <div><div class="k">AWS_REGION</div><div class="v"><code>{{ s.region }}</code>{{ s.region_set ? '' : ' (default – set it in .env)' }}</div></div>
+        </li>
+        <li>
+          <span class="state" [class.ok]="s.model_id_set" [class.warn]="!s.model_id_set"><app-icon [name]="s.model_id_set ? 'check' : 'alert'" [size]="14" /></span>
+          <div><div class="k">BEDROCK_MODEL_ID</div><div class="v"><code>{{ s.model_id }}</code>{{ s.model_id_set ? '' : ' (default – set it in .env)' }}</div></div>
+        </li>
+        <li>
+          <span class="state ok"><app-icon name="check" [size]="14" /></span>
+          <div><div class="k">Simulated data</div><div class="v">{{ s.stock_items }} stock items · {{ s.interaction_rules }} interaction rules</div></div>
+        </li>
+      </ul>
+    }
+
+    <div class="test">
+      <button type="button" class="btn primary" (click)="testConnection()" [disabled]="checking() || store.backendDown()">
+        @if (checking()) { <span class="spinner"></span> Testing… } @else { <app-icon name="sparkle" [size]="16" /> Test connection }
+      </button>
+      <span class="muted small">Sends one tiny message to the model (a fraction of a cent).</span>
+    </div>
+    @if (check(); as c) {
+      @if (c.ok) {
+        <div class="alert good"><app-icon name="checkCircle" /><div><div class="title">Connected</div><p>{{ c.model_id }} replied "{{ c.reply }}" in {{ seconds(c.latency_ms) }}.</p></div></div>
+      } @else {
+        <div class="alert bad">
+          <app-icon name="error" />
+          <div>
+            <div class="title">Connection failed{{ c.error_type ? ' (' + c.error_type + ')' : '' }}</div>
+            <p class="msg">{{ c.message }}</p>
+            @if (c.message?.includes('no identity-based policy')) {
+              <p>Fix: add the <code>bedrock:InvokeModel</code> policy to your IAM user (see README → Configuration).</p>
+            } @else if (c.message?.includes('model access') || c.message?.includes("don't have access")) {
+              <p>Fix: enable the model in Bedrock → Model access.</p>
+            }
+          </div>
+        </div>
+      }
+    }
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Privacy &amp; safety</h2></div>
+    <ul class="bullets">
+      <li><app-icon name="shield" [size]="16" /> <span>Photos are resized and stripped of all metadata before they are sent, and are never stored.</span></li>
+      <li><app-icon name="shield" [size]="16" /> <span>The model is told to ignore patient name, address, age and doctor details.</span></li>
+      <li><app-icon name="shield" [size]="16" /> <span>Only drug items, token counts and timings are logged (<code>logs/</code>, git-ignored).</span></li>
+      <li><app-icon name="shield" [size]="16" /> <span>No API keys in the code or repository – the AWS credential chain is used.</span></li>
+      <li><app-icon name="alert" [size]="16" /> <span>Decision support only – the pharmacist confirms every item.</span></li>
+    </ul>
+    <div class="card-head spaced"><h2>Cost estimate</h2></div>
+    <p class="muted">Dashboard costs use <code>PRICE_INPUT_PER_1M</code> / <code>PRICE_OUTPUT_PER_1M</code> (default $0.33 / $2.75, Nova 2 Lite US inference profile). Confirm against the AWS pricing page and your bill.</p>
+  </section>
+</div>

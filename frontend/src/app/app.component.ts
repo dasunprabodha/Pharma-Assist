@@ -1,30 +1,30 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ConfigStatus, StatusService } from './status.service';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
+import { StatusStore } from './core/status.store';
+import { IconComponent } from './shared/icon.component';
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, IconComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-  private readonly statusService = inject(StatusService);
+  readonly store = inject(StatusStore);
+  private readonly router = inject(Router);
+  readonly navOpen = signal(false);
 
-  readonly status = signal<ConfigStatus | null>(null);
-  readonly backendError = signal(false);
+  readonly nav = [
+    { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+    { path: '/scan', label: 'New prescription', icon: 'scan' },
+    { path: '/history', label: 'History', icon: 'history' },
+    { path: '/stock', label: 'Stock & rules', icon: 'stock' },
+    { path: '/settings', label: 'Settings', icon: 'settings' }
+  ];
 
   ngOnInit(): void {
-    this.refresh();
-  }
-
-  refresh(): void {
-    this.backendError.set(false);
-    this.statusService.getStatus().subscribe({
-      next: (s) => this.status.set(s),
-      error: () => {
-        this.status.set(null);
-        this.backendError.set(true);
-      }
-    });
+    this.store.refresh();
+    this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe(() => this.navOpen.set(false));
   }
 }

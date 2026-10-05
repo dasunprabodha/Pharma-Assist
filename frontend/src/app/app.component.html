@@ -1,42 +1,51 @@
-<main>
-  <header>
-    <h1>Prescription Reader</h1>
-    <p class="who">For <strong>Pharmacist A</strong> &middot; Dulnitha Pharmacy, Kottawa</p>
-    <p class="problem">
-      About 200 prescriptions a day, 70&ndash;80% handwritten, each taking 2&ndash;3 minutes to decipher and
-      match to stock &mdash; this tool uses Amazon Nova on Amazon Bedrock to read them into an editable list.
-    </p>
-    <p class="disclaimer">Decision support only &ndash; the pharmacist must confirm every item.</p>
-  </header>
-
-  <section class="config" aria-labelledby="config-title">
-    <div class="config-head">
-      <h2 id="config-title">Configuration</h2>
-      <button type="button" (click)="refresh()">Re-check</button>
+<div class="shell" [class.nav-open]="navOpen()">
+  <aside class="sidebar" aria-label="Main navigation">
+    <div class="brand">
+      <span class="logo"><app-icon name="pill" [size]="20" /></span>
+      <div>
+        <div class="brand-name">Prescription Reader</div>
+        <div class="brand-sub">Dulnitha Pharmacy</div>
+      </div>
     </div>
+    <nav>
+      @for (link of nav; track link.path) {
+        <a [routerLink]="link.path" routerLinkActive="active" class="nav-link">
+          <app-icon [name]="link.icon" />
+          <span>{{ link.label }}</span>
+        </a>
+      }
+    </nav>
+    <div class="sidebar-foot">
+      <div class="who">Pharmacist A</div>
+      <div class="muted small">Amazon Nova on Amazon Bedrock</div>
+    </div>
+  </aside>
+  <div class="scrim" (click)="navOpen.set(false)"></div>
 
-    @if (status(); as s) {
-      <ul>
-        <li [class.ok]="s.credentialsFound" [class.bad]="!s.credentialsFound">
-          AWS credentials:
-          @if (s.credentialsFound) {
-            found{{ s.profile ? ' (profile ' + s.profile + ')' : '' }}
-          } @else {
-            not found &ndash; run <code>aws configure --profile prescription-reader</code>
-          }
-        </li>
-        <li [class.ok]="s.regionSet" [class.warn]="!s.regionSet">
-          AWS_REGION: {{ s.region }}{{ s.regionSet ? '' : ' (default – set it in .env)' }}
-        </li>
-        <li [class.ok]="s.modelIdSet" [class.warn]="!s.modelIdSet">
-          BEDROCK_MODEL_ID: <code>{{ s.modelId }}</code>{{ s.modelIdSet ? '' : ' (default – set it in .env)' }}
-        </li>
-        <li class="ok">Simulated data: {{ s.stockItems }} stock items, {{ s.interactionRules }} interaction rules</li>
-      </ul>
-    } @else if (backendError()) {
-      <p class="bad">Backend not reachable on port 8080. Start it with <code>mvn spring-boot:run</code> in <code>backend/</code>.</p>
-    } @else {
-      <p>Checking&hellip;</p>
-    }
-  </section>
-</main>
+  <div class="main">
+    <header class="topbar">
+      <button type="button" class="icon-btn menu-btn" (click)="navOpen.set(!navOpen())" aria-label="Open navigation">
+        <app-icon name="menu" />
+      </button>
+      <div class="disclaimer">
+        <app-icon name="shield" [size]="16" />
+        <span>Decision support only – the pharmacist must confirm every item.</span>
+      </div>
+      <a routerLink="/settings" class="status-pill"
+         [class.ok]="store.status()?.credentials_found"
+         [class.bad]="store.backendDown() || (store.status() && !store.status()!.credentials_found)">
+        <span class="dot"></span>
+        @if (store.backendDown()) {
+          Backend offline
+        } @else if (store.status()) {
+          {{ store.status()!.credentials_found ? 'AI ready' : 'AI not configured' }}
+        } @else {
+          Checking…
+        }
+      </a>
+    </header>
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

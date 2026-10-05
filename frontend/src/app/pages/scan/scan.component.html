@@ -1,0 +1,289 @@
+<div class="page-head">
+  <div>
+    <h1>New prescription</h1>
+    <p>Read a handwritten prescription with Amazon Nova, then review and confirm every item.</p>
+  </div>
+  @if (stage() !== 'confirmed') {
+    <div class="segmented" role="tablist" aria-label="Entry method">
+      <button type="button" role="tab" [class.on]="mode() === 'ai'" [attr.aria-selected]="mode() === 'ai'" (click)="setMode('ai')">
+        <app-icon name="sparkle" [size]="16" /> Read from photo
+      </button>
+      <button type="button" role="tab" [class.on]="mode() === 'manual'" [attr.aria-selected]="mode() === 'manual'" (click)="setMode('manual')">
+        <app-icon name="edit" [size]="16" /> Manual entry
+      </button>
+    </div>
+  }
+</div>
+
+<ol class="stepper" aria-label="Progress">
+  @for (step of ['Photo', 'Review & correct', 'Confirmed']; track step; let i = $index) {
+    <li [class.done]="i < stepIndex()" [class.current]="i === stepIndex()">
+      <span class="num">
+        @if (i < stepIndex()) { <app-icon name="check" [size]="14" /> } @else { {{ i + 1 }} }
+      </span>
+      {{ step }}
+    </li>
+  }
+</ol>
+
+@if (error(); as err) {
+  <div class="alert" [class.bad]="!err.fallback_to_manual" [class.warn]="err.fallback_to_manual" role="alert">
+    <app-icon [name]="err.fallback_to_manual ? 'alert' : 'error'" />
+    <div class="grow">
+      <div class="title">{{ errorTitle(err) }}</div>
+      <p>{{ err.message }}</p>
+      @if (err.detail && err.detail !== err.message) {
+        <p class="small detail">Details: {{ err.detail }}</p>
+      }
+    </div>
+    <button type="button" class="icon-btn" aria-label="Dismiss" (click)="error.set(null)"><app-icon name="x" [size]="16" /></button>
+  </div>
+}
+
+<!-- ===== Step 1: upload ===== -->
+@if (stage() === 'upload' || stage() === 'reading') {
+  <div class="upload-grid">
+    <section class="card">
+      @if (rendering()) {
+        <div class="dropzone rendering"><span class="spinner"></span><strong>Preparing PDF pages…</strong></div>
+      } @else if (!previewUrl()) {
+        <label class="dropzone" [class.drag]="dragging()" (drop)="onDrop($event)" (dragover)="onDragOver($event)" (dragleave)="dragging.set(false)">
+          <input type="file" [accept]="accept" (change)="onFileInput($event)" class="sr-only" />
+          <span class="drop-icon"><app-icon name="upload" [size]="26" /></span>
+          <strong>Drop a prescription photo or PDF here, or click to browse</strong>
+          <span class="muted">JPG, PNG, WEBP or PDF (up to 3 pages) · up to 10 MB</span>
+        </label>
+        <div class="or"><span>or</span></div>
+        <label class="btn camera">
+          <input type="file" accept="image/*" capture="environment" (change)="onFileInput($event)" class="sr-only" />
+          <app-icon name="camera" /> Take a photo
+        </label>
+      } @else {
+        <div class="preview" [class.reading]="stage() === 'reading'" [class.multi]="pages().length > 1">
+          @for (src of pages(); track $index) {
+            <img [src]="src" [alt]="pdfPages() ? 'PDF page ' + ($index + 1) : 'Selected prescription photo'" />
+          }
+          @if (stage() === 'reading') {
+            <div class="scanline"></div>
+            <div class="reading-overlay">
+              <span class="spinner"></span>
+              <div>
+                <strong>Reading with Amazon Nova…</strong>
+                <div class="small">{{ seconds(elapsedMs()) }} · target under 30 s</div>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="file-row">
+          <div class="file-name">
+            <app-icon name="scan" [size]="16" />
+            <span>{{ file()?.name }}</span>
+            <span class="muted small">{{ ((file()?.size ?? 0) / 1024 / 1024).toFixed(1) }} MB{{ pdfPages() ? ' · ' + pdfPages()!.length + ' page' + (pdfPages()!.length === 1 ? '' : 's') : '' }}</span>
+          </div>
+          <button type="button" class="btn ghost" (click)="clearFile()" [disabled]="stage() === 'reading'">Change file</button>
+          <button type="button" class="btn primary lg" (click)="read()" [disabled]="stage() === 'reading'">
+            @if (stage() === 'reading') { <span class="spinner"></span> Reading… } @else { <app-icon name="sparkle" /> Read prescription }
+          </button>
+        </div>
+      }
+    </section>
+
+    <aside class="card tips">
+      <h2>For the best reading</h2>
+      <ul>
+        <li><app-icon name="check" [size]="16" /> Lay the prescription flat in good light</li>
+        <li><app-icon name="check" [size]="16" /> Fill the frame; avoid shadows and glare</li>
+        <li><app-icon name="check" [size]="16" /> One prescription per photo</li>
+        <li><app-icon name="check" [size]="16" /> PDF scans work too – upload only the prescription page(s), up to 3</li>
+      </ul>
+      <h2>Privacy</h2>
+      <p>The photo (or each PDF page, rendered as an image) is resized and <strong>all metadata is removed</strong>
+        before it is sent to Amazon Bedrock. Uploads are not stored, and patient name, address and doctor details are ignored.</p>
+      <p class="muted small">Use synthetic or redacted samples only during testing.</p>
+    </aside>
+  </div>
+}
+
+<!-- ===== Step 2: review ===== -->
+@if (stage() === 'review') {
+  <div class="review-grid" [class.no-image]="!previewUrl()">
+    @if (previewUrl()) {
+      <section class="card image-panel">
+        <div class="card-head">
+          <h2>{{ pdfPages() ? 'Prescription PDF' : 'Prescription photo' }}</h2>
+          <button type="button" class="icon-btn" (click)="zoomed.set(true)" aria-label="Enlarge"><app-icon name="zoom" /></button>
+        </div>
+        <button type="button" class="image-btn" (click)="zoomed.set(true)">
+          @for (src of pages(); track $index) {
+            <img [src]="src" [alt]="pdfPages() ? 'PDF page ' + ($index + 1) : 'Prescription photo for comparison'" />
+          }
+        </button>
+        <p class="muted small">Compare each row with the photo before confirming.</p>
+      </section>
+    }
+
+    <section class="card table-panel">
+      <div class="card-head">
+        <div>
+          <h2 class="row">
+            Items
+            @if (source() === 'ai') {
+              <span class="badge info"><app-icon name="sparkle" [size]="12" /> AI-extracted</span>
+            } @else {
+              <span class="badge"><app-icon name="edit" [size]="12" /> Manual entry</span>
+            }
+          </h2>
+          @if (result(); as r) {
+            <div class="sub">
+              Read in {{ seconds(r.latency_ms) }}{{ r.pages > 1 ? ' · ' + r.pages + ' pages' : '' }} · {{ r.input_tokens + r.output_tokens }} tokens · ≈ {{ usd(r.estimated_cost_usd) }} · {{ r.model_id }}
+            </div>
+          } @else {
+            <div class="sub">Human-entered items default to high confidence.</div>
+          }
+        </div>
+        @if (source() === 'ai') {
+          <span class="badge" [class.warn]="corrections() > 0">{{ corrections() }} correction{{ corrections() === 1 ? '' : 's' }}</span>
+        }
+      </div>
+
+      @if (lowRows().length) {
+        <div class="alert warn">
+          <app-icon name="alert" />
+          <div>
+            <div class="title">{{ lowRows().length }} item{{ lowRows().length === 1 ? '' : 's' }} need checking</div>
+            <ul>
+              @for (n of lowRows(); track n) {
+                <li>Row {{ n }}: low confidence – please verify</li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
+
+      <div class="legend">
+        <span><span class="dot-status high"></span> High – clearly read</span>
+        <span><span class="dot-status medium"></span> Medium – probably right</span>
+        <span><span class="dot-status low"></span> Low – verify against the photo</span>
+        @if (source() === 'ai') {
+          <span><span class="changed-key"></span> Edited by pharmacist</span>
+        }
+      </div>
+
+      <div class="table-wrap">
+        <table class="data edit-table">
+          <thead>
+            <tr>
+              <th class="idx">#</th>
+              @for (f of fields; track f) { <th>{{ labels[f] }}</th> }
+              <th>Confidence</th>
+              <th><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows; track row.key; let i = $index) {
+              <tr [class.low]="row.item.confidence === 'low'" [class.invalid]="invalidRows().has(i)">
+                <td class="idx">{{ i + 1 }}</td>
+                @for (f of fields; track f) {
+                  <td [class]="'col-' + f">
+                    <input class="cell" [class.changed]="isChanged(row, f)" [class.drug]="f === 'drug_name'"
+                           [(ngModel)]="row.item[f]" [placeholder]="row.item[f] === null && row.orig ? 'unreadable' : placeholders[f]"
+                           [attr.aria-label]="labels[f] + ', row ' + (i + 1)" />
+                    @if (f === 'drug_name' && row.item.note) {
+                      <div class="note" [class.warn-note]="row.item.note.startsWith('Not found') || row.item.note.startsWith('Drug name unreadable')">
+                        {{ row.item.note }}
+                      </div>
+                    }
+                  </td>
+                }
+                <td>
+                  <div class="conf">
+                    <span class="dot-status" [class]="'dot-status ' + row.item.confidence"></span>
+                    <select class="cell" [ngModel]="row.item.confidence" (ngModelChange)="setConfidence(row, $event)"
+                            [attr.aria-label]="'Confidence, row ' + (i + 1)">
+                      <option value="high">High</option>
+                      <option value="medium">Medium</option>
+                      <option value="low">Low</option>
+                    </select>
+                  </div>
+                </td>
+                <td>
+                  <button type="button" class="icon-btn" (click)="deleteRow(row)" [attr.aria-label]="'Delete row ' + (i + 1)">
+                    <app-icon name="trash" [size]="16" />
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="8" class="empty-row">No items. Add a row to start.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn" (click)="addRow()"><app-icon name="plus" [size]="16" /> Add row</button>
+        <button type="button" class="btn" (click)="recheckNames()" [disabled]="busy() || !rows.length" title="Match drug names against the stock list">
+          <app-icon name="refresh" [size]="16" /> Check names against stock
+        </button>
+        <span class="grow"></span>
+        <button type="button" class="btn ghost" (click)="startOver()">Cancel</button>
+        <button type="button" class="btn primary lg" (click)="confirm()" [disabled]="busy()">
+          <app-icon name="check" /> Confirm list ({{ rows.length }})
+        </button>
+      </div>
+    </section>
+  </div>
+}
+
+<!-- ===== Step 3: confirmed ===== -->
+@if (stage() === 'confirmed' && confirmed(); as c) {
+  <section class="card confirmed">
+    <div class="confirmed-head">
+      <span class="big-check"><app-icon name="checkCircle" [size]="28" /></span>
+      <div>
+        <h2>List confirmed – {{ c.items.length }} item{{ c.items.length === 1 ? '' : 's' }}</h2>
+        <p class="muted">
+          {{ c.source === 'ai' ? 'AI-extracted' : 'Manual entry' }}
+          @if (c.source === 'ai') { · {{ c.corrections }} pharmacist correction{{ c.corrections === 1 ? '' : 's' }} }
+          · Ref {{ c.id }}
+        </p>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th>#</th><th>Drug name</th><th>Strength</th><th>Dose</th><th>Frequency</th><th>Duration</th></tr></thead>
+        <tbody>
+          @for (item of c.items; track $index) {
+            <tr>
+              <td>{{ $index + 1 }}</td>
+              <td><strong>{{ item.drug_name }}</strong></td>
+              <td>{{ item.strength || '–' }}</td>
+              <td>{{ item.dose || '–' }}</td>
+              <td>{{ item.frequency || '–' }}</td>
+              <td>{{ item.duration || '–' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="alert info next">
+      <app-icon name="info" />
+      <p>This confirmed list is the input to the dispensing check (stock, generics and interactions), which arrives in Feature 2.</p>
+    </div>
+    <div class="actions">
+      <a routerLink="/history" class="btn">View history</a>
+      <span class="grow"></span>
+      <button type="button" class="btn primary lg" (click)="startOver()"><app-icon name="plus" /> New prescription</button>
+    </div>
+  </section>
+}
+
+@if (zoomed() && previewUrl()) {
+  <div class="lightbox" (click)="zoomed.set(false)" role="dialog" aria-label="Enlarged prescription">
+    <button type="button" class="icon-btn close" aria-label="Close"><app-icon name="x" /></button>
+    <div class="lightbox-pages" [class.multi]="pages().length > 1">
+      @for (src of pages(); track $index) {
+        <img [src]="src" [alt]="'Enlarged page ' + ($index + 1)" (click)="$event.stopPropagation()" />
+      }
+    </div>
+  </div>
+}

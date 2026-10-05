@@ -63,6 +63,21 @@ public final class AppConfig {
                 .orElse(Path.of("data")));
     }
 
+    /** Folder for usage.csv and confirmed.jsonl (git-ignored). */
+    public static Path logsDir() {
+        return get("LOGS_DIR").map(Path::of).orElseGet(() -> dataDir().toAbsolutePath().normalize().resolveSibling("logs"));
+    }
+
+    /** USD per 1M input tokens, for cost estimates (default: Nova 2 Lite, US geo inference profile). */
+    public static double inputPricePerMillion() {
+        return get("PRICE_INPUT_PER_1M").map(Double::parseDouble).orElse(0.33);
+    }
+
+    /** USD per 1M output tokens, for cost estimates (default: Nova 2 Lite, US geo inference profile). */
+    public static double outputPricePerMillion() {
+        return get("PRICE_OUTPUT_PER_1M").map(Double::parseDouble).orElse(2.75);
+    }
+
     private static Map<String, String> loadDotenv() {
         Map<String, String> values = new HashMap<>();
         for (Path root : PROJECT_ROOT_CANDIDATES) {

@@ -1,0 +1,88 @@
+<div class="page-head">
+  <div>
+    <h1>History</h1>
+    <p>Pharmacist-confirmed prescription lists. Drug items only – no patient details are stored.</p>
+  </div>
+  <button type="button" class="btn" (click)="exportCsv()" [disabled]="!filtered().length"><app-icon name="download" [size]="16" /> Export CSV</button>
+</div>
+
+@if (error(); as err) {
+  <div class="alert bad"><app-icon name="error" /><p>{{ err.message }}</p></div>
+}
+
+<section class="card">
+  <div class="toolbar">
+    <label class="search">
+      <app-icon name="search" [size]="16" />
+      <input class="input" type="search" placeholder="Search drug name or ref" [ngModel]="query()" (ngModelChange)="query.set($event); visible.set(pageSize)" aria-label="Search" />
+    </label>
+    <div class="segmented" role="tablist" aria-label="Filter by source">
+      <button type="button" [class.on]="source() === 'all'" (click)="source.set('all')">All</button>
+      <button type="button" [class.on]="source() === 'ai'" (click)="source.set('ai')">AI-extracted</button>
+      <button type="button" [class.on]="source() === 'manual'" (click)="source.set('manual')">Manual</button>
+    </div>
+    <span class="muted small count">{{ filtered().length }} of {{ all().length }}</span>
+  </div>
+
+  @if (loading()) {
+    <p class="muted center">Loading…</p>
+  } @else if (!all().length) {
+    <div class="empty">
+      <h3>No confirmed prescriptions yet</h3>
+      <p>Confirmed lists appear here.</p>
+      <a routerLink="/scan" class="btn primary"><app-icon name="plus" [size]="16" /> New prescription</a>
+    </div>
+  } @else {
+    <ul class="list">
+      @for (p of shown(); track p.id) {
+        <li [class.open]="expanded().has(p.id)">
+          <button type="button" class="summary" (click)="toggle(p.id)" [attr.aria-expanded]="expanded().has(p.id)">
+            <app-icon name="chevron" [size]="16" class="chev" />
+            <span class="when">{{ dateTime(p.confirmed_at) }}</span>
+            @if (p.source === 'ai') {
+              <span class="badge info"><app-icon name="sparkle" [size]="12" /> AI</span>
+            } @else {
+              <span class="badge"><app-icon name="edit" [size]="12" /> Manual</span>
+            }
+            <span class="drugs">{{ summary(p) }}</span>
+            <span class="meta">
+              {{ p.items.length }} item{{ p.items.length === 1 ? '' : 's' }}
+              @if (p.source === 'ai') { · {{ p.corrections }} correction{{ p.corrections === 1 ? '' : 's' }} }
+            </span>
+            <code class="muted">{{ p.id }}</code>
+          </button>
+          @if (expanded().has(p.id)) {
+            <div class="detail table-wrap">
+              <table class="data">
+                <thead><tr><th>#</th><th>Drug name</th><th>Strength</th><th>Dose</th><th>Frequency</th><th>Duration</th><th>Confidence</th><th>Note</th></tr></thead>
+                <tbody>
+                  @for (i of p.items; track $index) {
+                    <tr>
+                      <td>{{ $index + 1 }}</td>
+                      <td><strong>{{ i.drug_name }}</strong></td>
+                      <td>{{ i.strength || '–' }}</td>
+                      <td>{{ i.dose || '–' }}</td>
+                      <td>{{ i.frequency || '–' }}</td>
+                      <td>{{ i.duration || '–' }}</td>
+                      <td><span class="conf"><span [class]="'dot-status ' + i.confidence"></span>{{ i.confidence }}</span></td>
+                      <td class="muted small">{{ i.note || '–' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </li>
+      } @empty {
+        <li class="muted center">No lists match the filter.</li>
+      }
+    </ul>
+    @if (filtered().length > shown().length) {
+      <div class="more">
+        <button type="button" class="btn" (click)="visible.set(visible() + pageSize)">
+          Show more ({{ filtered().length - shown().length }} remaining)
+        </button>
+      </div>
+    }
+  }
+</section>

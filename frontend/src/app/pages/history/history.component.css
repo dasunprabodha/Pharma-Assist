@@ -1,0 +1,38 @@
+.toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.search { position: relative; flex: 1; min-width: 220px; max-width: 380px; display: flex; }
+.search app-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.search .input { width: 100%; padding-left: 32px; }
+.count { margin-left: auto; }
+.center { text-align: center; padding: 20px; }
+
+.list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.list > li + li { border-top: 1px solid var(--border); }
+.summary {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 16px 120px auto 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 0;
+  background: var(--surface-1);
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.summary:hover { background: var(--surface-2); }
+.chev { transition: transform 0.15s; color: var(--text-muted); }
+li.open .chev { transform: rotate(90deg); }
+.when { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.drugs { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.meta { color: var(--text-muted); font-size: 12px; white-space: nowrap; }
+.detail { margin: 0 14px 14px; }
+.conf { display: inline-flex; align-items: center; gap: 6px; text-transform: capitalize; }
+
+@media (max-width: 760px) {
+  .summary { grid-template-columns: 16px 1fr auto; }
+  .summary .drugs { grid-column: 2 / -1; white-space: normal; }
+  .summary .meta, .summary code { grid-column: 2 / -1; }
+}
+.more { display: flex; justify-content: center; margin-top: 14px; }

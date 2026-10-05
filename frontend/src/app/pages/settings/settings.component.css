@@ -1,0 +1,16 @@
+.grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.checks li { display: flex; gap: 12px; align-items: flex-start; }
+.state { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--surface-2); color: var(--text-muted); flex-shrink: 0; }
+.state.ok { background: var(--good-bg); color: var(--good-text); }
+.state.warn { background: var(--warning-bg); color: var(--warning-text); }
+.state.bad { background: var(--critical-bg); color: var(--critical-text); }
+.k { font-weight: 600; }
+.v { color: var(--text-secondary); word-break: break-word; }
+.test { display: flex; align-items: center; gap: 12px; margin: 20px 0 14px; flex-wrap: wrap; }
+.msg { word-break: break-word; }
+.bullets { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.bullets li { display: flex; gap: 10px; color: var(--text-secondary); }
+.bullets app-icon { color: var(--accent-strong); margin-top: 2px; }
+.spaced { margin-top: 22px; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
