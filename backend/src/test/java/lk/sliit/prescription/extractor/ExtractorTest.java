@@ -3,6 +3,7 @@ package lk.sliit.prescription.extractor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -31,6 +32,7 @@ import software.amazon.awssdk.services.bedrockruntime.model.ConverseOutput;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseRequest;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseResponse;
 import software.amazon.awssdk.services.bedrockruntime.model.Message;
+import software.amazon.awssdk.services.bedrockruntime.model.ModelErrorException;
 import software.amazon.awssdk.services.bedrockruntime.model.ThrottlingException;
 import software.amazon.awssdk.services.bedrockruntime.model.ToolUseBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.ValidationException;
@@ -117,7 +119,16 @@ class ExtractorTest {
         List<ContentBlock> content = captor.getValue().messages().get(0).content();
         assertEquals(3, content.size());
         assertEquals("jpeg", content.get(1).image().formatAsString());
-        assertEquals(Extractor.PROMPT, content.get(2).text());
+        assertEquals(extractor.prompt(), content.get(2).text());
+    }
+
+    @Test
+    void promptVersionIsSelectable() {
+        assertEquals(Extractor.PROMPT_V1, new Extractor(() -> client, "m", "v1").prompt());
+        assertEquals(Extractor.PROMPT_V2, new Extractor(() -> client, "m", "v2").prompt());
+        assertEquals(Extractor.PROMPT_V3, new Extractor(() -> client, "m", "v3").prompt());
+        assertEquals(Extractor.PROMPT_V2, new Extractor(() -> client, "m").prompt());
+        assertTrue(Extractor.PROMPT_V3.contains("STRICT RULES") && Extractor.PROMPT_V3.endsWith("readable\": false}."));
     }
 
     @Test
@@ -164,6 +175,17 @@ class ExtractorTest {
         assertEquals(Confidence.LOW, items.get(0).confidence());
         assertNull(items.get(1).drugName());
         assertEquals(Confidence.LOW, items.get(1).confidence());
+    }
+
+    @Test
+    void modelErrorIsRetriedOnceThenInvalidResponse() {
+        ModelErrorException bad = ModelErrorException.builder().statusCode(424)
+                .awsErrorDetails(details("ModelErrorException")).build();
+        when(client.converse(any(ConverseRequest.class))).thenThrow(bad).thenReturn(text(TC1_JSON));
+        assertEquals(2, extractor.extractItems(IMAGE).size());
+
+        when(client.converse(any(ConverseRequest.class))).thenThrow(bad);
+        assertThrows(InvalidResponseError.class, () -> extractor.extractItems(IMAGE));
     }
 
     @Test

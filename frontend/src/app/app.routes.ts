@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { unsavedChangesGuard } from './core/unsaved-changes.guard';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
@@ -10,6 +11,7 @@ export const routes: Routes = [
   {
     path: 'scan',
     title: 'New prescription · Prescription Reader',
+    canDeactivate: [unsavedChangesGuard],
     loadComponent: () => import('./pages/scan/scan.component').then((m) => m.ScanComponent)
   },
   {

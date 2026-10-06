@@ -77,7 +77,10 @@ training [Assumption].
   - The upload is held in memory only, and the image is re-encoded, so no EXIF/GPS data or PDF metadata is sent.
   - The prompt and response schema exclude the patient's name, address and age and the doctor's details.
   - Only drug items, token counts and timings are logged.
-  - **No patient data and no images are stored.**
+  - **No patient data is stored, and by default no images are stored.** An optional setting (`KEEP_IMAGES`, off by
+    default) keeps the processed image of a *confirmed* list for 7 days so it can be checked from History; it is then
+    deleted automatically, and the pharmacist can delete it sooner. Because the photo may show the patient's name, this
+    setting would need the pharmacy owner's agreement before real use.
   - During development only synthetic or redacted samples are used.
 - **Least-privilege access.** A dedicated IAM user is allowed only `bedrock:InvokeModel` on Amazon Nova models.
   - Credentials live in the AWS CLI profile, never in code or git; `.env` is git-ignored.
@@ -86,7 +89,8 @@ training [Assumption].
 - **Gaps before production:**
   - User login and HTTPS (the PoC has no login).
   - Audit logging of who confirmed each list.
-  - A retention policy for the confirmed lists.
+  - A retention policy for the confirmed lists (saved images already have one: `IMAGE_RETENTION_DAYS`).
+  - Encryption at rest for saved images, if `KEEP_IMAGES` is used.
   - A written agreement with the pharmacy owner.
 
 ## Benefits
@@ -107,9 +111,11 @@ training [Assumption].
 
 ## Limitations
 
-- **Handwriting accuracy** on real Sri Lankan prescriptions is **not yet measured**. The first scan was a crude
-  synthetic image and was correctly flagged low confidence. The model can misread, so every item must be confirmed
-  by the pharmacist.
+- **Handwriting accuracy is low on dense cursive prescriptions** [Measured, n = 9 redacted Sri Lankan samples,
+  `docs/evaluation.md`]: with Nova 2 Lite and prompt v2, 76% of items were found, 52% of drug names and 42% of
+  fields read correctly. Every item with an error was flagged, but the model often **adds a duration that is not
+  written** (e.g. "5 days") and sometimes **misses an item** without a flag. Nova Pro did not do better. Every item
+  must therefore be checked against the photo by the pharmacist.
 - **Decision support only:** it does not replace the pharmacist's judgement or a clinical drug-interaction database.
 - **Simulated data:** 34 stock items and 21 textbook rules, with no live stock-system integration.
 - **Internet required;** without it, only manual entry is available.

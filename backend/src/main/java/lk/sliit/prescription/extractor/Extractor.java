@@ -46,7 +46,8 @@ public class Extractor {
 
     public static final String TOOL_NAME = "record_prescription";
 
-    public static final String PROMPT = """
+    /** v1 - the original prompt from CLAUDE.md 6.3 (baseline in docs/evaluation.md). */
+    public static final String PROMPT_V1 = """
             You are reading a photo of a handwritten medical prescription from Sri Lanka. Return ONLY JSON matching \
             the schema. For each prescribed item give drug_name exactly as written, strength, dose, frequency and \
             duration. Expand common abbreviations in frequency (bd = twice daily, tds = three times daily, \
@@ -56,6 +57,52 @@ public class Extractor {
             Ignore any patient name, address, age or doctor details - never include them in the output. If the image \
             is not a prescription or nothing is readable, return {"items": [], "readable": false}. If several images \
             are given, they are pages of the same prescription: list the items from all pages once.""";
+
+    /**
+     * v2 - adds Sri Lankan prescription conventions, asks for every line (to reduce missed items),
+     * and tightens when "high" confidence may be used. Compared with v1 in docs/evaluation.md.
+     */
+    public static final String PROMPT_V2 = """
+            You are reading a photo of a handwritten prescription from a Sri Lankan clinic or hospital, for a \
+            pharmacist. Record it with the record_prescription tool.
+            LIST EVERY PRESCRIBED LINE, in order - tablets, capsules, syrups, creams, lotions, shampoos, injections \
+            and medical supplies (syringes, needles, plasters, gloves, spirit, cotton wool). Lines are often numbered \
+            (1, 2, 3, sometimes in circles) or start with a dash or dot. Never skip a line because it is hard to read: \
+            write the letters you can see, set unreadable fields to null and set confidence to low.
+            Fields:
+            - drug_name: the product name exactly as written (brand or generic), without "Tab", "Cap" or "Inj". \
+            Do NOT guess or invent a drug name.
+            - strength: number and unit, e.g. "60 mg", "500 mg", "1 mg", "5%", "40 mg/ml"; null if not written.
+            - dose: amount each time, e.g. "1 tablet", "1/2 tablet", "1/3 tablet", "2 tablets", "1 ml", "1 vial", \
+            "02" (a supply quantity); null if not written.
+            - frequency: expanded, keeping the abbreviation, e.g. "twice daily (bd)".
+            - duration: expanded, e.g. "3 months (3/12)"; null if not written.
+            Sri Lankan shorthand: bd = twice daily; tds = three times daily; qds = four times daily; daily or od = \
+            once daily; mane = in the morning; nocte = at night; stat = immediately; sos or prn = when needed; \
+            1x2 = one tablet twice daily; 2x3 = two tablets three times daily; 1+0+1 = morning and night. \
+            Durations: 5/7 = 5 days, 2/52 = 2 weeks, 3/12 = 3 months, 1/12 = 1 month, 1/A or 1 yr = 1 year. \
+            A number in a circle after a drug is usually the quantity to supply, not the dose.
+            Confidence: high only if every written field of the item is clearly legible; medium if any part is \
+            uncertain; low if the drug name itself is uncertain.
+            Ignore the patient's name, age and address, the doctor's details, dates, laboratory results, blood \
+            pressure and other clinical notes - never include them. If the image is not a prescription or nothing \
+            is readable, return {"items": [], "readable": false}.""";
+
+    /**
+     * v3 - v2 plus rules against filling in values that are not written (the evaluation showed v1/v2 adding a
+     * "5 days" duration to most items), against replacing a brand with its generic, and against splitting one item.
+     */
+    public static final String PROMPT_V3 = PROMPT_V2.replace(
+            "Ignore the patient's name",
+            """
+            STRICT RULES - a pharmacist will dispense from this list:
+            - Only record what is actually written on that item's line. If no duration is written, duration MUST be \
+            null; if no dose is written, dose MUST be null; if no strength is written, strength MUST be null. Never \
+            use a typical or default value (for example never add "5 days" or "1 tablet" unless it is written).
+            - Never replace a brand name with its generic name or another drug (write "Sitavic", not "Sitagliptin").
+            - One item = one drug name and the directions written next to or under it. Do not split one item into \
+            several items, and do not turn a direction line (for example "for 1/A" or "after bath") into an item.
+            Ignore the patient's name""");
 
     static final String SCHEMA_JSON = """
             {
@@ -89,11 +136,22 @@ public class Extractor {
     private final Supplier<BedrockRuntimeClient> clientSupplier;
     private final String modelId;
     private final ToolSpecification toolSpec;
+    private final String prompt;
     private volatile boolean forcedToolSupported = true;
 
     public Extractor(Supplier<BedrockRuntimeClient> clientSupplier, String modelId) {
+        this(clientSupplier, modelId, "v2");
+    }
+
+    /** @param promptVersion "v1" (baseline), "v2" (Sri Lankan conventions) or "v3" (v2 + no invented values). */
+    public Extractor(Supplier<BedrockRuntimeClient> clientSupplier, String modelId, String promptVersion) {
         this.clientSupplier = clientSupplier;
         this.modelId = modelId;
+        this.prompt = switch (promptVersion == null ? "" : promptVersion.toLowerCase()) {
+            case "v1" -> PROMPT_V1;
+            case "v3" -> PROMPT_V3;
+            default -> PROMPT_V2;
+        };
         try {
             this.toolSpec = ToolSpecification.builder()
                     .name(TOOL_NAME)
@@ -109,6 +167,14 @@ public class Extractor {
         return modelId;
     }
 
+    public String prompt() {
+        return prompt;
+    }
+
+    public String promptVersion() {
+        return prompt == PROMPT_V1 ? "v1" : prompt == PROMPT_V2 ? "v2" : "v3";
+    }
+
     public List<Item> extractItems(byte[] jpeg) {
         return extractItems(List.of(jpeg), new TokenUsage());
     }
@@ -120,7 +186,16 @@ public class Extractor {
      */
     public List<Item> extractItems(List<byte[]> pages, TokenUsage usage) {
         for (int attempt = 1; ; attempt++) {
-            ConverseResponse response = callModel(pages);
+            ConverseResponse response;
+            try {
+                response = callModel(pages);
+            } catch (InvalidResponseError e) {
+                // Bedrock ModelErrorException: the model produced a malformed answer - retry once, like invalid JSON.
+                if (attempt >= MAX_ATTEMPTS) {
+                    throw e;
+                }
+                continue;
+            }
             if (response.usage() != null) {
                 usage.add(response.usage().inputTokens(), response.usage().outputTokens());
             }
@@ -166,7 +241,7 @@ public class Extractor {
                     .source(ImageSource.fromBytes(SdkBytes.fromByteArray(jpeg)))
                     .build()));
         }
-        content.add(ContentBlock.fromText(PROMPT));
+        content.add(ContentBlock.fromText(prompt));
         ToolChoice choice = forceTool
                 ? ToolChoice.fromTool(SpecificToolChoice.builder().name(TOOL_NAME).build())
                 : ToolChoice.fromAuto(a -> { });
@@ -272,6 +347,7 @@ public class Extractor {
                 case "AccessDeniedException", "ValidationException", "ResourceNotFoundException",
                      "UnrecognizedClientException", "ExpiredTokenException", "InvalidSignatureException" ->
                         new ConfigError(detail, e);
+                case "ModelErrorException" -> new InvalidResponseError(detail, e);
                 case "ThrottlingException", "ServiceUnavailableException", "ModelNotReadyException",
                      "InternalServerException", "ModelTimeoutException", "ServiceQuotaExceededException" ->
                         new AIUnavailableError(detail, e);

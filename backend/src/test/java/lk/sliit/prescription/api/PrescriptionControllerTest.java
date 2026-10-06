@@ -1,7 +1,15 @@
 package lk.sliit.prescription.api;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -11,6 +19,7 @@ import lk.sliit.prescription.data.DataLoader;
 import lk.sliit.prescription.errors.ConfigError;
 import lk.sliit.prescription.errors.InvalidImageError;
 import lk.sliit.prescription.history.ConfirmedStore;
+import lk.sliit.prescription.history.ImageStore;
 import lk.sliit.prescription.namecheck.NameCheck;
 import lk.sliit.prescription.service.DashboardService;
 import lk.sliit.prescription.service.ScanService;
@@ -38,12 +47,14 @@ class PrescriptionControllerTest {
     private DashboardService dashboardService;
     @MockitoBean
     private DataLoader dataLoader;
+    @MockitoBean
+    private ImageStore imageStore;
 
     private final MockMultipartFile photo = new MockMultipartFile("file", "rx.jpg", "image/jpeg", new byte[] {1});
 
     @Test
     void configErrorSwitchesToManualEntry() throws Exception {
-        when(scanService.scan(any(), any())).thenThrow(new ConfigError("AccessDeniedException: no policy"));
+        when(scanService.scan(any(), any(), org.mockito.ArgumentMatchers.anyBoolean())).thenThrow(new ConfigError("AccessDeniedException: no policy"));
         mvc.perform(multipart("/api/scans").file(photo))
                 .andExpect(status().isServiceUnavailable())
                 .andExpect(jsonPath("$.error_type").value("config_error"))
@@ -54,7 +65,7 @@ class PrescriptionControllerTest {
 
     @Test
     void invalidImageAsksForAnotherFile() throws Exception {
-        when(scanService.scan(any(), any())).thenThrow(new InvalidImageError("Only JPG, PNG or WEBP photos are accepted."));
+        when(scanService.scan(any(), any(), org.mockito.ArgumentMatchers.anyBoolean())).thenThrow(new InvalidImageError("Only JPG, PNG or WEBP photos are accepted."));
         mvc.perform(multipart("/api/scans").file(photo))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fallback_to_manual").value(false))
@@ -91,5 +102,58 @@ class PrescriptionControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.source").value("manual"))
                 .andExpect(jsonPath("$.items[0].drug_name").value("Panadol"));
+    }
+
+    @Test
+    void nameSuggestionsReturnOneListPerName() throws Exception {
+        when(nameCheck.suggest("Lipitr")).thenReturn(
+                java.util.List.of(new NameCheck.Suggestion("Lipitor", "atorvastatin", "20 mg", false, 92)));
+        when(nameCheck.suggest("")).thenReturn(java.util.List.of());
+        mvc.perform(post("/api/name-suggestions").contentType(MediaType.APPLICATION_JSON).content("[\"Lipitr\", \"\"]"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0][0].name").value("Lipitor"))
+                .andExpect(jsonPath("$[0][0].generic_name").value("atorvastatin"))
+                .andExpect(jsonPath("$[0][0].in_stock").value(false))
+                .andExpect(jsonPath("$[1]").isEmpty());
+    }
+
+    private static final String ITEMS = "[{\"drug_name\":\"Lipitor\",\"strength\":\"20 mg\",\"dose\":null,"
+            + "\"frequency\":null,\"duration\":null,\"confidence\":\"high\",\"note\":null}]";
+
+    @Test
+    void confirmingAnAiListKeepsItsImage() throws Exception {
+        when(imageStore.pageCount(anyString())).thenReturn(1);
+        mvc.perform(post("/api/prescriptions").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"source\":\"ai\",\"scan_id\":\"aaaa1111\",\"corrections\":0,\"items\":" + ITEMS + "}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").isString()) // record fields are unwrapped next to image_pages
+                .andExpect(jsonPath("$.items[0].drug_name").value("Lipitor"))
+                .andExpect(jsonPath("$.image_pages").value(1));
+        verify(imageStore).keep(eq("aaaa1111"), anyString());
+    }
+
+    @Test
+    void manualListNeverKeepsAnImage() throws Exception {
+        mvc.perform(post("/api/prescriptions").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"source\":\"manual\",\"scan_id\":\"aaaa1111\",\"items\":" + ITEMS + "}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.image_pages").value(0));
+        verify(imageStore, never()).keep(anyString(), anyString());
+    }
+
+    @Test
+    void savedImageIsServedWithoutCaching() throws Exception {
+        when(imageStore.read("bbbb2222", 1)).thenReturn(java.util.Optional.of(new byte[] {9}));
+        mvc.perform(get("/api/prescriptions/bbbb2222/images/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.IMAGE_JPEG))
+                .andExpect(header().string("Cache-Control", "no-store"));
+        mvc.perform(get("/api/prescriptions/bbbb2222/images/2")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteImageEndpoint() throws Exception {
+        mvc.perform(delete("/api/prescriptions/bbbb2222/images")).andExpect(status().isNoContent());
+        verify(imageStore).delete("bbbb2222");
     }
 }

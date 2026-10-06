@@ -26,6 +26,15 @@ export interface ScanResult {
   estimated_cost_usd: number;
 }
 
+/** A stock-list name offered for a drug name ("Did you mean…?"). */
+export interface NameSuggestion {
+  name: string;
+  generic_name: string;
+  strength: string;
+  in_stock: boolean;
+  score: number;
+}
+
 export type ErrorType =
   | 'config_error'
   | 'invalid_image'
@@ -33,6 +42,7 @@ export type ErrorType =
   | 'unreadable_image'
   | 'invalid_response'
   | 'validation'
+  | 'cancelled'
   | 'network';
 
 export interface ApiError {
@@ -52,6 +62,10 @@ export interface ConfirmedPrescription {
   scan_id: string | null;
   items: Item[];
   corrections: number;
+  /** Saved image pages (0 if none, expired or deleted). Only with KEEP_IMAGES=true. */
+  image_pages?: number;
+  /** When the saved image will be deleted automatically. */
+  image_expires_at?: string | null;
 }
 
 export interface ConfigStatus {
@@ -63,6 +77,8 @@ export interface ConfigStatus {
   model_id_set: boolean;
   stock_items: number;
   interaction_rules: number;
+  keep_images: boolean;
+  image_retention_days: number;
 }
 
 export interface BedrockCheck {

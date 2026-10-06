@@ -27,6 +27,8 @@
   --info-bg: #e9f1fc;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 1px 1px rgb(0 0 0 / 0.03);
   --radius: 12px;
+  --tooltip-bg: #232321;
+  --tooltip-text: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -53,6 +55,8 @@
     --critical-bg: #2e1717;
     --info-bg: #17222f;
     --shadow: none;
+    --tooltip-bg: #e9e8e3;
+    --tooltip-text: #121211;
   }
 }
 
@@ -79,6 +83,8 @@
   --critical-bg: #2e1717;
   --info-bg: #17222f;
   --shadow: none;
+  --tooltip-bg: #e9e8e3;
+  --tooltip-text: #121211;
 }
 
 * { box-sizing: border-box; }
@@ -259,3 +265,43 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
   animation: spin 0.8s linear infinite;
   display: inline-block;
 }
+
+/* Tooltips (TooltipDirective renders these into <body>) */
+.app-tooltip {
+  position: fixed;
+  z-index: 1000;
+  max-width: 280px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--tooltip-bg);
+  color: var(--tooltip-text);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.18);
+}
+.app-tooltip[data-side='bottom'] { transform: translateY(-2px); }
+.app-tooltip.show { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .app-tooltip { transition: none; } }
+
+/* Small "?" help marker next to labels and headers */
+.help {
+  display: inline-grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  margin-left: 4px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: help;
+  vertical-align: middle;
+}
+.help:hover, .help:focus-visible { color: var(--accent-strong); }

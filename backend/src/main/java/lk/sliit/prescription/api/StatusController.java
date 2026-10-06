@@ -5,6 +5,7 @@ import java.util.Map;
 import lk.sliit.prescription.config.AppConfig;
 import lk.sliit.prescription.config.BedrockClients;
 import lk.sliit.prescription.data.DataLoader;
+import lk.sliit.prescription.history.ImageStore;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.ContentBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.ConversationRole;
@@ -23,9 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class StatusController {
 
     private final DataLoader data;
+    private final ImageStore imageStore;
 
-    public StatusController(DataLoader data) {
+    public StatusController(DataLoader data, ImageStore imageStore) {
         this.data = data;
+        this.imageStore = imageStore;
     }
 
     @GetMapping("/status")
@@ -37,8 +40,11 @@ public class StatusController {
         status.put("region_set", AppConfig.isRegionSet());
         status.put("model_id", AppConfig.modelId());
         status.put("model_id_set", AppConfig.isModelIdSet());
+        status.put("prompt_version", AppConfig.promptVersion());
         status.put("stock_items", data.stock().size());
         status.put("interaction_rules", data.rules().size());
+        status.put("keep_images", imageStore.enabled());
+        status.put("image_retention_days", imageStore.retentionDays());
         return status;
     }
 

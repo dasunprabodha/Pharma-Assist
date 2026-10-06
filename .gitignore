@@ -38,3 +38,11 @@ frontend/.angular/
 
 # Real (dataset) prescription images - not synthetic, keep out of the public repo
 /Samples Prescriptions/
+/Samples Sri Lanka/
+
+# Python bytecode
+__pycache__/
+
+# Redacted Sri Lankan samples and screenshots showing them - local only, not for GitHub
+/samples/sri_lanka/
+/docs/screenshots/

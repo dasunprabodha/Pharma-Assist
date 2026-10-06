@@ -32,6 +32,7 @@ plus a dashboard, history and reference-data views. Feature 2 (dispensing check)
 
 - [Architecture](docs/architecture.md) – diagram, components, data flow and failure paths
 - [Feasibility study (draft)](docs/feasibility.md) – technical, data, skills, time, privacy (PDPA), benefits, limitations, risks, costs, adoption
+- [Accuracy evaluation](docs/evaluation.md) – 9 redacted Sri Lankan samples, prompts v1–v3 and Nova Pro: `python3 scripts/evaluate.py --api v2=http://localhost:8080` (real Bedrock calls; ground truth in `samples/ground_truth.json`)
 - Cost estimate: `python3 scripts/cost_estimate.py` (Python 3 standard library; reads `logs/usage.csv`; `--help` lists the settings)
 
 ## Professional and problem
@@ -113,8 +114,11 @@ All JSON uses snake_case field names. Base URL: `http://localhost:8080`.
 | POST | `/api/preview` | Multipart `file` → `{pages: [data URL…]}` – the page images that would be sent to the model (renders PDFs for preview; no AWS call) |
 | POST | `/api/scans` | Multipart `file` (JPG/PNG/WEBP, or PDF ≤ 3 pages; ≤ 10 MB) → `{scan_id, pages, items[], low_confidence_rows[], input_tokens, output_tokens, latency_ms, estimated_cost_usd}`. PDF pages are rendered to images at 200 DPI and sent as one image block per page |
 | POST | `/api/name-check` | Body: `Item[]` → the same items with stock-list match notes / low-confidence flags |
+| POST | `/api/name-suggestions` | Body: drug names (`string[]`) → up to 3 stock-list names per name (`name`, `generic_name`, `strength`, `in_stock`, `score`), best first, for the "Did you mean…?" chips |
 | POST | `/api/prescriptions` | Body: `{source: "ai"\|"manual", scan_id, items[], corrections}` → saves the confirmed list (every row needs `drug_name`) |
-| GET | `/api/prescriptions` | Confirmed lists, newest first |
+| GET | `/api/prescriptions` | Confirmed lists, newest first, each with `image_pages` / `image_expires_at` (saved image, if any) |
+| GET | `/api/prescriptions/{id}/images/{page}` | Saved prescription image page (JPEG, `Cache-Control: no-store`); 404 if none, deleted or expired |
+| DELETE | `/api/prescriptions/{id}/images` | Delete a confirmed list's saved image now (the drug list is kept) |
 | GET | `/api/dashboard` | Aggregated figures for the dashboard |
 | GET | `/api/stock`, `/api/rules` | Simulated reference data |
 
@@ -130,11 +134,22 @@ All JSON uses snake_case field names. Base URL: `http://localhost:8080`.
 | `ai_unavailable` | 503 | "AI service unavailable – using manual entry" |
 | `invalid_response` | 502 | "AI returned an unexpected result – using manual entry" (after one retry) |
 
-Optional settings: `PRICE_INPUT_PER_1M` / `PRICE_OUTPUT_PER_1M` (cost estimate, default $0.33 / $2.75 for Nova 2 Lite on the US
+Optional settings: `PROMPT_VERSION` (`v2` default; `v1`, `v3` for comparison – see the evaluation), `PRICE_INPUT_PER_1M` / `PRICE_OUTPUT_PER_1M` (cost estimate, default $0.33 / $2.75 for Nova 2 Lite on the US
 inference profile), `LOGS_DIR` (default `logs/`).
 
+**History images (optional, off by default):** `KEEP_IMAGES=true` keeps the processed image of each *confirmed* AI list so
+History can show it next to the drug list; `IMAGE_RETENTION_DAYS` (default 7) sets when it is deleted automatically.
+- Only the processed image is kept (metadata stripped, resized to ≤ 1600 px JPEG); the original upload is never stored.
+- After a scan the image is held in memory only and written to disk only when the pharmacist confirms the list; unconfirmed
+  scans are forgotten after 30 minutes. Manual-entry lists have no image.
+- Images are deleted hourly once older than the retention period (also if `KEEP_IMAGES` is later turned off), or at once
+  with **Delete image** in History.
+- A prescription photo usually shows the patient's name, so leave this off unless the pharmacist needs it, and use only
+  synthetic or redacted samples during testing.
+
 **Logs** (git-ignored): `logs/usage.csv` – one row per scan (outcome, item counts, input/output tokens, latency; no images or
-patient data); `logs/confirmed.jsonl` – confirmed drug lists.
+patient data); `logs/confirmed.jsonl` – confirmed drug lists; `logs/scan-images/` – saved History images (only with
+`KEEP_IMAGES=true`).
 
 ## Running the app
 
@@ -191,6 +206,8 @@ image metadata is stripped before any image is sent to Amazon Bedrock.
 - Name matching is fuzzy (WRatio ≥ 85) against a 34-item simulated list – a flagging aid, not a drug database.
 - Cost figures are estimates from token counts × configured prices; the AWS bill is authoritative.
 - Single-user proof of concept: no login; history is stored in local files.
+- With `KEEP_IMAGES=true`, saved images (which may show patient details) are plain files in `logs/scan-images/` – not
+  encrypted and not access-controlled beyond the local machine; they are protected only by short retention and deletion.
 - PDFs are limited to 3 pages (one prescription); each page costs image tokens, so a 3-page PDF costs about three times a photo.
 - Simulated stock and rule data (see above).
 

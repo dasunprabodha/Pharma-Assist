@@ -1,13 +1,16 @@
 import { Component, input } from '@angular/core';
 import { IconComponent } from './icon.component';
+import { TooltipDirective } from './tooltip.directive';
 
 /** KPI tile: label · value · optional context line. */
 @Component({
   selector: 'app-stat-tile',
-  imports: [IconComponent],
+  imports: [IconComponent, TooltipDirective],
   template: `
     <div class="tile" [class.hero]="hero()">
-      <div class="label"><app-icon [name]="icon()" [size]="16" /> {{ label() }}</div>
+      <div class="label"><app-icon [name]="icon()" [size]="16" /> {{ label() }}
+        @if (hint()) { <span class="help" tabindex="0" [attr.aria-label]="hint()" [appTooltip]="hint()">?</span> }
+      </div>
       <div class="value">{{ value() }}</div>
       @if (context()) {
         <div class="context" [class.good]="tone() === 'good'" [class.warn]="tone() === 'warn'">{{ context() }}</div>
@@ -40,4 +43,5 @@ export class StatTileComponent {
   readonly icon = input('info');
   readonly tone = input<'neutral' | 'good' | 'warn'>('neutral');
   readonly hero = input(false);
+  readonly hint = input<string>('');
 }

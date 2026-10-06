@@ -7,18 +7,23 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lk.sliit.prescription.data.DataLoader;
 import lk.sliit.prescription.errors.InvalidImageError;
 import lk.sliit.prescription.history.ConfirmedPrescription;
 import lk.sliit.prescription.history.ConfirmedStore;
+import lk.sliit.prescription.history.ImageStore;
 import lk.sliit.prescription.image.ImageUtils;
 import lk.sliit.prescription.model.Item;
 import lk.sliit.prescription.namecheck.NameCheck;
 import lk.sliit.prescription.service.DashboardService;
 import lk.sliit.prescription.service.ScanResult;
 import lk.sliit.prescription.service.ScanService;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,21 +42,39 @@ public class PrescriptionController {
     private final ConfirmedStore confirmedStore;
     private final DashboardService dashboardService;
     private final DataLoader data;
+    private final ImageStore imageStore;
 
     public PrescriptionController(ScanService scanService, NameCheck nameCheck, ConfirmedStore confirmedStore,
-                                  DashboardService dashboardService, DataLoader data) {
+                                  DashboardService dashboardService, DataLoader data, ImageStore imageStore) {
         this.scanService = scanService;
         this.nameCheck = nameCheck;
         this.confirmedStore = confirmedStore;
         this.dashboardService = dashboardService;
         this.data = data;
+        this.imageStore = imageStore;
     }
 
-    /** Feature 1: photo or PDF -> AI extraction -> name-checked items. The upload is not stored. */
+    /**
+     * A confirmed list as returned to the UI, plus whether a saved image exists. Image fields are worked out
+     * on each request (not stored in confirmed.jsonl) because images expire or can be deleted.
+     */
+    public record PrescriptionView(@JsonUnwrapped ConfirmedPrescription prescription, int imagePages,
+                                   Instant imageExpiresAt) {
+    }
+
+    private PrescriptionView view(ConfirmedPrescription p) {
+        return new PrescriptionView(p, imageStore.pageCount(p.id()), imageStore.expiresAt(p.id()).orElse(null));
+    }
+
+    /**
+     * Feature 1: photo or PDF -> AI extraction -> name-checked items. The upload itself is never stored; the
+     * processed image is kept only if KEEP_IMAGES=true and the list is confirmed (see ImageStore).
+     */
     @PostMapping("/scans")
-    public ScanResult scan(@RequestParam("file") MultipartFile file) {
+    public ScanResult scan(@RequestParam("file") MultipartFile file,
+                           @RequestParam(name = "name_check", defaultValue = "true") boolean nameCheck) {
         try {
-            return scanService.scan(file.getOriginalFilename(), file.getBytes());
+            return scanService.scan(file.getOriginalFilename(), file.getBytes(), nameCheck);
         } catch (IOException e) {
             throw new InvalidImageError("The upload could not be read. Please try again.", e);
         }
@@ -79,6 +102,12 @@ public class PrescriptionController {
         return nameCheck.check(items);
     }
 
+    /** "Did you mean…?" suggestions: one list per drug name (empty for a blank name). */
+    @PostMapping("/name-suggestions")
+    public List<List<NameCheck.Suggestion>> nameSuggestions(@RequestBody List<String> drugNames) {
+        return drugNames.stream().map(nameCheck::suggest).toList();
+    }
+
     public record ConfirmRequest(String source, String scanId, List<Item> items, Integer corrections) {
     }
 
@@ -103,17 +132,38 @@ public class PrescriptionController {
                 Instant.now(), source, req.scanId(), items,
                 source.equals("ai") && req.corrections() != null ? Math.max(0, req.corrections()) : 0);
         confirmedStore.save(saved);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        if (source.equals("ai") && req.scanId() != null) {
+            imageStore.keep(req.scanId(), saved.id());
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(view(saved));
     }
 
     @GetMapping("/prescriptions")
-    public List<ConfirmedPrescription> prescriptions() {
-        return confirmedStore.findAll();
+    public List<PrescriptionView> prescriptions() {
+        return confirmedStore.findAll().stream().map(this::view).toList();
     }
 
     @GetMapping("/prescriptions/{id}")
-    public ResponseEntity<ConfirmedPrescription> prescription(@PathVariable String id) {
-        return ResponseEntity.of(confirmedStore.findById(id));
+    public ResponseEntity<PrescriptionView> prescription(@PathVariable String id) {
+        return ResponseEntity.of(confirmedStore.findById(id).map(this::view));
+    }
+
+    /** One saved page (1-based) of a confirmed list's image. Not cached by the browser. */
+    @GetMapping("/prescriptions/{id}/images/{page}")
+    public ResponseEntity<byte[]> image(@PathVariable String id, @PathVariable int page) {
+        return imageStore.read(id, page)
+                .map(bytes -> ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .cacheControl(CacheControl.noStore())
+                        .body(bytes))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /** Delete a confirmed list's saved image now (the drug items are kept). */
+    @DeleteMapping("/prescriptions/{id}/images")
+    public ResponseEntity<Void> deleteImage(@PathVariable String id) {
+        imageStore.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/dashboard")

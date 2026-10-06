@@ -1,0 +1,57 @@
+{
+  "_status": "PROVISIONAL - read by Claude Code from the redacted images on 06/10/2026; the student/pharmacist must verify and correct. Fields listed in 'uncertain' are not scored; null = not written on the prescription (not scored).",
+  "_fields": "drug_name, strength, dose, frequency, duration",
+  "samples": {
+    "SL02.jpg": [
+      {"drug_name": "Minoxin", "strength": null, "dose": "1 ml", "frequency": "bd", "duration": "1 year", "uncertain": ["drug_name"]},
+      {"drug_name": "Ionax", "strength": null, "dose": null, "frequency": null, "duration": null, "uncertain": []}
+    ],
+    "SL04.jpg": [
+      {"drug_name": "Depo-Medrol", "strength": "40 mg", "dose": null, "frequency": null, "duration": null, "uncertain": []}
+    ],
+    "SL05.jpg": [
+      {"drug_name": "Dazor", "strength": null, "dose": null, "frequency": null, "duration": null, "uncertain": ["drug_name"]},
+      {"drug_name": "Terbinafine", "strength": "250 mg", "dose": null, "frequency": "daily", "duration": "6/52", "uncertain": []},
+      {"drug_name": "Beprogel", "strength": null, "dose": null, "frequency": null, "duration": null, "uncertain": []}
+    ],
+    "SL06.jpg": [
+      {"drug_name": "Gliclazide MR", "strength": "60 mg", "dose": null, "frequency": "bd", "duration": null, "uncertain": []},
+      {"drug_name": "Glucophage SR", "strength": "500 mg", "dose": null, "frequency": "bd", "duration": null, "uncertain": []},
+      {"drug_name": "Sitavic", "strength": "100 mg", "dose": null, "frequency": "mane", "duration": null, "uncertain": ["drug_name"]},
+      {"drug_name": "Atorvastatin", "strength": "10 mg", "dose": null, "frequency": "nocte", "duration": null, "uncertain": []},
+      {"drug_name": "?", "strength": "25 mg", "dose": null, "frequency": "bd", "duration": null, "uncertain": ["drug_name"]}
+    ],
+    "SL07.jpg": [
+      {"drug_name": "Diamicron MR", "strength": "60 mg", "dose": null, "frequency": "bd", "duration": null, "uncertain": []},
+      {"drug_name": "Glucophage SR", "strength": null, "dose": "2 tablets", "frequency": "bd", "duration": null, "uncertain": ["dose"]},
+      {"drug_name": "Sitavic", "strength": "100 mg", "dose": null, "frequency": "mane", "duration": null, "uncertain": ["drug_name"]},
+      {"drug_name": "Bimpa", "strength": "10 mg", "dose": null, "frequency": "nocte", "duration": null, "uncertain": ["drug_name"]},
+      {"drug_name": "Nitroguard", "strength": null, "dose": null, "frequency": null, "duration": null, "uncertain": ["strength"]}
+    ],
+    "SL09.jpg": [
+      {"drug_name": "Gliclazide MR", "strength": "60 mg", "dose": null, "frequency": "bd", "duration": null, "uncertain": []},
+      {"drug_name": "Glucophage SR", "strength": null, "dose": "2 tablets", "frequency": "bd", "duration": null, "uncertain": ["dose"]},
+      {"drug_name": "Sitavic", "strength": "100 mg", "dose": null, "frequency": "mane", "duration": null, "uncertain": ["drug_name"]},
+      {"drug_name": "Bimpa", "strength": "10 mg", "dose": null, "frequency": "nocte", "duration": null, "uncertain": ["drug_name"]}
+    ],
+    "SL10.jpg": [
+      {"drug_name": "Scanos lotion", "strength": null, "dose": "1 ml", "frequency": "bd", "duration": "3/12", "uncertain": ["drug_name"]},
+      {"drug_name": "Finasteride", "strength": "5 mg", "dose": "1/3 tablet", "frequency": "nocte", "duration": "3/12", "uncertain": []},
+      {"drug_name": "? shampoo", "strength": null, "dose": null, "frequency": null, "duration": null, "uncertain": ["drug_name"]},
+      {"drug_name": "Beprogel lotion", "strength": null, "dose": null, "frequency": null, "duration": null, "uncertain": []}
+    ],
+    "SL11.jpg": [
+      {"drug_name": "Finasteride", "strength": "1 mg", "dose": null, "frequency": "nocte", "duration": "3/12", "uncertain": []},
+      {"drug_name": "Ketoplus shampoo", "strength": null, "dose": null, "frequency": null, "duration": null, "uncertain": []}
+    ],
+    "SL12.jpg": [
+      {"drug_name": "3 cc syringe", "strength": null, "dose": "02", "frequency": null, "duration": null, "uncertain": []},
+      {"drug_name": "23G needle", "strength": null, "dose": "01", "frequency": null, "duration": null, "uncertain": []},
+      {"drug_name": "Depo-Medrol", "strength": "40 mg", "dose": "1 vial", "frequency": null, "duration": null, "uncertain": []},
+      {"drug_name": "Dettol plaster", "strength": null, "dose": "01", "frequency": null, "duration": null, "uncertain": []},
+      {"drug_name": "Disposable gloves", "strength": null, "dose": "01 pair", "frequency": null, "duration": null, "uncertain": []},
+      {"drug_name": "Surgical spirit", "strength": null, "dose": "01", "frequency": null, "duration": null, "uncertain": []},
+      {"drug_name": "Cotton wool", "strength": null, "dose": "01", "frequency": null, "duration": null, "uncertain": []}
+    ]
+  }
+}

@@ -1,4 +1,5 @@
 import { Component, computed, input } from '@angular/core';
+import { TooltipDirective } from './tooltip.directive';
 
 export interface BarItem {
   label: string;
@@ -10,10 +11,11 @@ export interface BarItem {
 /** Horizontal bar list: label left, thin bar, value at the tip. One series, so no legend. */
 @Component({
   selector: 'app-bar-list',
+  imports: [TooltipDirective],
   template: `
     <ul>
       @for (b of rows(); track b.label) {
-        <li [title]="b.label + ': ' + b.value">
+        <li [appTooltip]="b.label + ': ' + b.value">
           <span class="label">
             @if (b.status) { <i class="st" [class]="'st ' + b.status"></i> }
             {{ b.label }}

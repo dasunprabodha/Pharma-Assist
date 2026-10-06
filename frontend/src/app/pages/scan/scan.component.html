@@ -5,10 +5,10 @@
   </div>
   @if (stage() !== 'confirmed') {
     <div class="segmented" role="tablist" aria-label="Entry method">
-      <button type="button" role="tab" [class.on]="mode() === 'ai'" [attr.aria-selected]="mode() === 'ai'" (click)="setMode('ai')">
+      <button type="button" role="tab" [class.on]="mode() === 'ai'" [attr.aria-selected]="mode() === 'ai'" (click)="setMode('ai')" appTooltip="Upload a photo or PDF and let Amazon Nova read the items">
         <app-icon name="sparkle" [size]="16" /> Read from photo
       </button>
-      <button type="button" role="tab" [class.on]="mode() === 'manual'" [attr.aria-selected]="mode() === 'manual'" (click)="setMode('manual')">
+      <button type="button" role="tab" [class.on]="mode() === 'manual'" [attr.aria-selected]="mode() === 'manual'" (click)="setMode('manual')" appTooltip="Type the items yourself – use this if the AI is unavailable">
         <app-icon name="edit" [size]="16" /> Manual entry
       </button>
     </div>
@@ -36,7 +36,7 @@
         <p class="small detail">Details: {{ err.detail }}</p>
       }
     </div>
-    <button type="button" class="icon-btn" aria-label="Dismiss" (click)="error.set(null)"><app-icon name="x" [size]="16" /></button>
+    <button type="button" class="icon-btn" aria-label="Dismiss" appTooltip="Dismiss" (click)="error.set(null)"><app-icon name="x" [size]="16" /></button>
   </div>
 }
 
@@ -54,7 +54,7 @@
           <span class="muted">JPG, PNG, WEBP or PDF (up to 3 pages) · up to 10 MB</span>
         </label>
         <div class="or"><span>or</span></div>
-        <label class="btn camera">
+        <label class="btn camera" appTooltip="Opens the phone camera (on mobile). On a computer it opens the file picker.">
           <input type="file" accept="image/*" capture="environment" (change)="onFileInput($event)" class="sr-only" />
           <app-icon name="camera" /> Take a photo
         </label>
@@ -80,10 +80,20 @@
             <span>{{ file()?.name }}</span>
             <span class="muted small">{{ ((file()?.size ?? 0) / 1024 / 1024).toFixed(1) }} MB{{ pdfPages() ? ' · ' + pdfPages()!.length + ' page' + (pdfPages()!.length === 1 ? '' : 's') : '' }}</span>
           </div>
-          <button type="button" class="btn ghost" (click)="clearFile()" [disabled]="stage() === 'reading'">Change file</button>
-          <button type="button" class="btn primary lg" (click)="read()" [disabled]="stage() === 'reading'">
-            @if (stage() === 'reading') { <span class="spinner"></span> Reading… } @else { <app-icon name="sparkle" /> Read prescription }
-          </button>
+          @if (stage() === 'reading') {
+            <button type="button" class="btn ghost" (click)="cancelReading(false)" appTooltip="Stop waiting and go back to the photo">Cancel</button>
+            <button type="button" class="btn" (click)="cancelReading(true)"
+                    appTooltip="Stop waiting for the AI and type the items from the photo instead">
+              <app-icon name="edit" [size]="16" /> Enter manually instead
+            </button>
+            <button type="button" class="btn primary lg" disabled><span class="spinner"></span> Reading…</button>
+          } @else {
+            <button type="button" class="btn ghost" (click)="clearFile()" appTooltip="Pick a different photo or PDF">Change file</button>
+            <button type="button" class="btn primary lg" (click)="read()"
+                    appTooltip="Metadata is stripped, then the image is sent to Amazon Bedrock. Usually takes a few seconds.">
+              <app-icon name="sparkle" /> Read prescription
+            </button>
+          }
         </div>
       }
     </section>
@@ -98,7 +108,14 @@
       </ul>
       <h2>Privacy</h2>
       <p>The photo (or each PDF page, rendered as an image) is resized and <strong>all metadata is removed</strong>
-        before it is sent to Amazon Bedrock. Uploads are not stored, and patient name, address and doctor details are ignored.</p>
+        before it is sent to Amazon Bedrock. Patient name, address and doctor details are ignored.</p>
+      @if (status.status()?.keep_images) {
+        <p><strong>Image saving is on:</strong> when you confirm a list, its processed image is kept for
+          {{ status.status()!.image_retention_days }} day{{ status.status()!.image_retention_days === 1 ? '' : 's' }}
+          so it can be checked in History, then deleted automatically. The original upload is never stored.</p>
+      } @else {
+        <p>Uploads are not stored.</p>
+      }
       <p class="muted small">Use synthetic or redacted samples only during testing.</p>
     </aside>
   </div>
@@ -111,14 +128,10 @@
       <section class="card image-panel">
         <div class="card-head">
           <h2>{{ pdfPages() ? 'Prescription PDF' : 'Prescription photo' }}</h2>
-          <button type="button" class="icon-btn" (click)="zoomed.set(true)" aria-label="Enlarge"><app-icon name="zoom" /></button>
         </div>
-        <button type="button" class="image-btn" (click)="zoomed.set(true)">
-          @for (src of pages(); track $index) {
-            <img [src]="src" [alt]="pdfPages() ? 'PDF page ' + ($index + 1) : 'Prescription photo for comparison'" />
-          }
-        </button>
-        <p class="muted small">Compare each row with the photo before confirming.</p>
+        <app-image-viewer [pages]="pages()" [label]="pdfPages() ? 'Prescription PDF page' : 'Prescription photo for comparison'"
+                          (enlarge)="zoomed.set(true)" />
+        <p class="muted small">Scroll or pinch to zoom · drag to pan · double-click to reset. Compare each row with the photo before confirming.</p>
       </section>
     }
 
@@ -128,13 +141,13 @@
           <h2 class="row">
             Items
             @if (source() === 'ai') {
-              <span class="badge info"><app-icon name="sparkle" [size]="12" /> AI-extracted</span>
+              <span class="badge info" appTooltip="These rows were read by Amazon Nova – check each one against the photo"><app-icon name="sparkle" [size]="12" /> AI-extracted</span>
             } @else {
-              <span class="badge"><app-icon name="edit" [size]="12" /> Manual entry</span>
+              <span class="badge" appTooltip="These rows were typed by the pharmacist"><app-icon name="edit" [size]="12" /> Manual entry</span>
             }
           </h2>
           @if (result(); as r) {
-            <div class="sub">
+            <div class="sub" appTooltip="Read time · tokens used · estimated Bedrock cost · model ID">
               Read in {{ seconds(r.latency_ms) }}{{ r.pages > 1 ? ' · ' + r.pages + ' pages' : '' }} · {{ r.input_tokens + r.output_tokens }} tokens · ≈ {{ usd(r.estimated_cost_usd) }} · {{ r.model_id }}
             </div>
           } @else {
@@ -142,7 +155,7 @@
           }
         </div>
         @if (source() === 'ai') {
-          <span class="badge" [class.warn]="corrections() > 0">{{ corrections() }} correction{{ corrections() === 1 ? '' : 's' }}</span>
+          <span class="badge" [class.warn]="corrections() > 0" appTooltip="Fields you changed, added or deleted compared with the AI reading">{{ corrections() }} correction{{ corrections() === 1 ? '' : 's' }}</span>
         }
       </div>
 
@@ -174,8 +187,10 @@
           <thead>
             <tr>
               <th class="idx">#</th>
-              @for (f of fields; track f) { <th>{{ labels[f] }}</th> }
-              <th>Confidence</th>
+              @for (f of fields; track f) {
+                <th>{{ labels[f] }}<span class="help" tabindex="0" [attr.aria-label]="hints[f]" [appTooltip]="hints[f]">?</span></th>
+              }
+              <th>Confidence<span class="help" tabindex="0" [attr.aria-label]="confidenceHint" [appTooltip]="confidenceHint">?</span></th>
               <th><span class="sr-only">Actions</span></th>
             </tr>
           </thead>
@@ -187,10 +202,23 @@
                   <td [class]="'col-' + f">
                     <input class="cell" [class.changed]="isChanged(row, f)" [class.drug]="f === 'drug_name'"
                            [(ngModel)]="row.item[f]" [placeholder]="row.item[f] === null && row.orig ? 'unreadable' : placeholders[f]"
-                           [attr.aria-label]="labels[f] + ', row ' + (i + 1)" />
+                           [attr.aria-label]="labels[f] + ', row ' + (i + 1)"
+                           [appTooltip]="cellHint(row, f)"
+                           (change)="f === 'drug_name' && onDrugNameChange(row)" />
                     @if (f === 'drug_name' && row.item.note) {
                       <div class="note" [class.warn-note]="row.item.note.startsWith('Not found') || row.item.note.startsWith('Drug name unreadable')">
                         {{ row.item.note }}
+                      </div>
+                    }
+                    @if (f === 'drug_name' && showSuggestions(row)) {
+                      <div class="suggest">
+                        <span class="suggest-label">Did you mean</span>
+                        @for (s of row.suggestions; track s.name) {
+                          <button type="button" class="chip" [class.oos]="!s.in_stock" (click)="applySuggestion(row, s)"
+                                  [appTooltip]="suggestionHint(s)" [attr.aria-label]="'Use ' + s.name + ' as the drug name for row ' + (i + 1)">
+                            {{ s.name }}
+                          </button>
+                        }
                       </div>
                     }
                   </td>
@@ -199,6 +227,7 @@
                   <div class="conf">
                     <span class="dot-status" [class]="'dot-status ' + row.item.confidence"></span>
                     <select class="cell" [ngModel]="row.item.confidence" (ngModelChange)="setConfidence(row, $event)"
+                            [appTooltip]="confidenceLabels[row.item.confidence]"
                             [attr.aria-label]="'Confidence, row ' + (i + 1)">
                       <option value="high">High</option>
                       <option value="medium">Medium</option>
@@ -207,7 +236,8 @@
                   </div>
                 </td>
                 <td>
-                  <button type="button" class="icon-btn" (click)="deleteRow(row)" [attr.aria-label]="'Delete row ' + (i + 1)">
+                  <button type="button" class="icon-btn" (click)="deleteRow(row)" [attr.aria-label]="'Delete row ' + (i + 1)"
+                          [appTooltip]="'Delete row ' + (i + 1)">
                     <app-icon name="trash" [size]="16" />
                   </button>
                 </td>
@@ -220,13 +250,15 @@
       </div>
 
       <div class="actions">
-        <button type="button" class="btn" (click)="addRow()"><app-icon name="plus" [size]="16" /> Add row</button>
-        <button type="button" class="btn" (click)="recheckNames()" [disabled]="busy() || !rows.length" title="Match drug names against the stock list">
+        <button type="button" class="btn" (click)="addRow()" appTooltip="Add an item the AI missed"><app-icon name="plus" [size]="16" /> Add row</button>
+        <button type="button" class="btn" (click)="recheckNames()" [disabled]="busy() || !rows.length"
+                appTooltip="Fuzzy-match each drug name against the stock list and flag names that are not found">
           <app-icon name="refresh" [size]="16" /> Check names against stock
         </button>
         <span class="grow"></span>
-        <button type="button" class="btn ghost" (click)="startOver()">Cancel</button>
-        <button type="button" class="btn primary lg" (click)="confirm()" [disabled]="busy()">
+        <button type="button" class="btn ghost" (click)="cancelReview()" appTooltip="Discard this list and start again">Cancel</button>
+        <button type="button" class="btn primary lg" (click)="confirm()" [disabled]="busy()"
+                appTooltip="Every row needs a drug name. The confirmed list is saved to History.">
           <app-icon name="check" /> Confirm list ({{ rows.length }})
         </button>
       </div>
@@ -245,6 +277,9 @@
           {{ c.source === 'ai' ? 'AI-extracted' : 'Manual entry' }}
           @if (c.source === 'ai') { · {{ c.corrections }} pharmacist correction{{ c.corrections === 1 ? '' : 's' }} }
           · Ref {{ c.id }}
+          @if ((c.image_pages ?? 0) > 0) {
+            · <span appTooltip="Viewable in History, then deleted automatically">image kept for {{ status.status()?.image_retention_days }} days</span>
+          }
         </p>
       </div>
     </div>
@@ -279,7 +314,7 @@
 
 @if (zoomed() && previewUrl()) {
   <div class="lightbox" (click)="zoomed.set(false)" role="dialog" aria-label="Enlarged prescription">
-    <button type="button" class="icon-btn close" aria-label="Close"><app-icon name="x" /></button>
+    <button type="button" class="icon-btn close" aria-label="Close" appTooltip="Close (or click anywhere)" tooltipPlacement="left"><app-icon name="x" /></button>
     <div class="lightbox-pages" [class.multi]="pages().length > 1">
       @for (src of pages(); track $index) {
         <img [src]="src" [alt]="'Enlarged page ' + ($index + 1)" (click)="$event.stopPropagation()" />

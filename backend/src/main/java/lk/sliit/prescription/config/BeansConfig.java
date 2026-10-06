@@ -23,6 +23,6 @@ public class BeansConfig {
                 return client;
             }
         };
-        return new Extractor(lazyClient, AppConfig.modelId());
+        return new Extractor(lazyClient, AppConfig.modelId(), AppConfig.promptVersion());
     }
 }

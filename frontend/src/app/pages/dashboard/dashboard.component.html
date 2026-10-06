@@ -4,7 +4,7 @@
     <p>How the prescription reader is performing – scans, speed, cost and pharmacist corrections.</p>
   </div>
   <div class="row">
-    <button type="button" class="btn" (click)="load()" [disabled]="loading()"><app-icon name="refresh" [size]="16" /> Refresh</button>
+    <button type="button" class="btn" (click)="load()" [disabled]="loading()" appTooltip="Reload figures from the backend"><app-icon name="refresh" [size]="16" /> Refresh</button>
     <a routerLink="/scan" class="btn primary"><app-icon name="plus" [size]="16" /> New prescription</a>
   </div>
 </div>
@@ -23,16 +23,16 @@
     </section>
   } @else {
     <div class="tiles">
-      <app-stat-tile label="Prescriptions confirmed" icon="checkCircle" [value]="compact(d.confirmed_total)"
+      <app-stat-tile label="Prescriptions confirmed" icon="checkCircle" hint="Lists the pharmacist has confirmed, from either the AI or manual entry" [value]="compact(d.confirmed_total)"
         [context]="d.confirmed_ai + ' AI-extracted · ' + d.confirmed_manual + ' manual · ' + d.items_confirmed + ' items'" />
-      <app-stat-tile label="AI read success" icon="sparkle" [value]="percent(d.success_rate)"
+      <app-stat-tile label="AI read success" icon="sparkle" hint="Share of AI scans that returned at least one readable item (green at 80% or more)" [value]="percent(d.success_rate)"
         [context]="d.scans_success + ' of ' + d.scans_total + ' scans'" [tone]="(d.success_rate ?? 0) >= 0.8 ? 'good' : 'warn'" />
-      <app-stat-tile label="Average read time" icon="clock" [value]="seconds(d.avg_latency_ms)"
+      <app-stat-tile label="Average read time" icon="clock" hint="Time from upload to editable list. R1 requires under 30 s. p95 = 95% of scans were at least this fast." [value]="seconds(d.avg_latency_ms)"
         [context]="'Target < 30 s · ' + percent(d.within_target_rate) + ' within target · p95 ' + seconds(d.p95_latency_ms)"
         [tone]="latencyTone(d)" />
-      <app-stat-tile label="Cost per scan (est.)" icon="coin" [value]="usd(d.cost_per_scan_usd)"
+      <app-stat-tile label="Cost per scan (est.)" icon="coin" hint="Estimated from logged token counts and the configured Bedrock prices – check the AWS bill for actual cost" [value]="usd(d.cost_per_scan_usd)"
         [context]="usd(d.cost_per_1000_scans_usd, 2) + ' per 1,000 scans · ' + usd(d.cost_total_usd) + ' total'" />
-      <app-stat-tile label="Corrections per AI list" icon="edit"
+      <app-stat-tile label="Corrections per AI list" icon="edit" hint="Average number of fields the pharmacist changed, added or deleted before confirming an AI-extracted list"
         [value]="d.corrections_per_ai_list == null ? '–' : d.corrections_per_ai_list.toFixed(1)"
         [context]="percent(d.ai_lists_unchanged_rate) + ' of AI lists confirmed unchanged'" />
     </div>
@@ -57,7 +57,7 @@
         @if (confidence().total) {
           <div class="split" role="img" [attr.aria-label]="'High ' + confidence().parts[0].value + ', medium ' + confidence().parts[1].value + ', low ' + confidence().parts[2].value">
             @for (p of confidence().parts; track p.key) {
-              @if (p.value) { <span [class]="'seg ' + p.key" [style.flex-grow]="p.value" [title]="p.label + ': ' + p.value"></span> }
+              @if (p.value) { <span [class]="'seg ' + p.key" [style.flex-grow]="p.value" [appTooltip]="p.label + ': ' + p.value + ' (' + p.pct.toFixed(0) + '%)'"></span> }
             }
           </div>
           <ul class="split-legend">
@@ -81,7 +81,7 @@
         <dl class="kv">
           <div><dt>Input tokens</dt><dd>{{ compact(d.input_tokens) }}</dd></div>
           <div><dt>Output tokens</dt><dd>{{ compact(d.output_tokens) }}</dd></div>
-          <div><dt>Avg tokens / successful scan</dt><dd>{{ d.scans_success ? compact((d.input_tokens + d.output_tokens) / d.scans_success) : '–' }}</dd></div>
+          <div><dt>Avg tokens / successful scan<span class="help" tabindex="0" aria-label="Input plus output tokens, averaged over successful scans. Images make up most of the input tokens." appTooltip="Input plus output tokens, averaged over successful scans. Images make up most of the input tokens.">?</span></dt><dd>{{ d.scans_success ? compact((d.input_tokens + d.output_tokens) / d.scans_success) : '–' }}</dd></div>
           <div><dt>Total cost (est.)</dt><dd>{{ usd(d.cost_total_usd) }}</dd></div>
         </dl>
         <p class="muted small foot">Prices: ${{ d.price_input_per_1m }} / ${{ d.price_output_per_1m }} per 1M input / output tokens (configurable). Check the AWS bill for actual cost.</p>
@@ -96,19 +96,19 @@
         <div class="table-wrap">
           <table class="data">
             <thead>
-              <tr><th>Time</th><th>Outcome</th><th class="num">Items</th><th class="num">Low conf.</th><th class="num">Read time</th><th class="num">Tokens</th><th class="num">Cost (est.)</th><th>Ref</th></tr>
+              <tr><th>Time</th><th>Outcome</th><th class="num">Items</th><th class="num"><span appTooltip="Items the AI marked low confidence">Low conf.</span></th><th class="num">Read time</th><th class="num">Tokens</th><th class="num">Cost (est.)</th><th>Ref</th></tr>
             </thead>
             <tbody>
               @for (s of d.recent_scans; track s.scan_id) {
                 <tr>
                   <td class="nowrap">{{ dateTime(s.timestamp) }}</td>
-                  <td><span class="badge" [class]="'badge ' + outcomeClass(s.outcome)">{{ outcomeLabels[s.outcome] || s.outcome }}</span></td>
+                  <td><span class="badge" [class]="'badge ' + outcomeClass(s.outcome)" [appTooltip]="outcomeHints[s.outcome]">{{ outcomeLabels[s.outcome] || s.outcome }}</span></td>
                   <td class="num">{{ s.item_count }}</td>
                   <td class="num">{{ s.low_confidence_count }}</td>
                   <td class="num">{{ seconds(s.latency_ms) }}</td>
                   <td class="num">{{ s.input_tokens + s.output_tokens }}</td>
                   <td class="num">{{ usd((s.input_tokens * d.price_input_per_1m + s.output_tokens * d.price_output_per_1m) / 1e6) }}</td>
-                  <td class="muted"><code>{{ s.scan_id }}</code></td>
+                  <td class="muted"><code appTooltip="Scan reference – matches the row in logs/usage.csv">{{ s.scan_id }}</code></td>
                 </tr>
               }
             </tbody>

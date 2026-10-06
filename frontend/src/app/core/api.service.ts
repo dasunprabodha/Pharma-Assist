@@ -8,6 +8,7 @@ import {
   ConfirmedPrescription,
   Dashboard,
   Item,
+  NameSuggestion,
   RuleRow,
   ScanResult,
   Source,
@@ -43,6 +44,11 @@ export class ApiService {
     return this.http.post<Item[]>('/api/name-check', items).pipe(catchError(toApiError));
   }
 
+  /** Up to three stock-list names per drug name, best first. */
+  nameSuggestions(names: string[]): Observable<NameSuggestion[][]> {
+    return this.http.post<NameSuggestion[][]>('/api/name-suggestions', names).pipe(catchError(toApiError));
+  }
+
   confirm(source: Source, scanId: string | null, items: Item[], corrections: number): Observable<ConfirmedPrescription> {
     return this.http
       .post<ConfirmedPrescription>('/api/prescriptions', { source, scan_id: scanId, items, corrections })
@@ -51,6 +57,17 @@ export class ApiService {
 
   prescriptions(): Observable<ConfirmedPrescription[]> {
     return this.http.get<ConfirmedPrescription[]>('/api/prescriptions').pipe(catchError(toApiError));
+  }
+
+  /** URL of one saved page (1-based) of a confirmed list's image. */
+  imageUrl(prescriptionId: string, page: number): string {
+    return `/api/prescriptions/${encodeURIComponent(prescriptionId)}/images/${page}`;
+  }
+
+  deleteImage(prescriptionId: string): Observable<void> {
+    return this.http
+      .delete<void>(`/api/prescriptions/${encodeURIComponent(prescriptionId)}/images`)
+      .pipe(catchError(toApiError));
   }
 
   dashboard(): Observable<Dashboard> {

@@ -1,10 +1,26 @@
-import { Component, OnDestroy, inject, signal } from '@angular/core';
+import { Component, HostListener, OnDestroy, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ApiService } from '../../core/api.service';
+import { ConfirmService } from '../../core/confirm.service';
+import { StatusStore } from '../../core/status.store';
 import { seconds, usd } from '../../core/format';
-import { ApiError, ConfirmedPrescription, Confidence, ITEM_FIELDS, Item, ItemField, ScanResult, Source } from '../../core/models';
+import {
+  ApiError,
+  ConfirmedPrescription,
+  Confidence,
+  ITEM_FIELDS,
+  Item,
+  ItemField,
+  NameSuggestion,
+  ScanResult,
+  Source
+} from '../../core/models';
+import { HasUnsavedWork } from '../../core/unsaved-changes.guard';
 import { IconComponent } from '../../shared/icon.component';
+import { ImageViewerComponent } from '../../shared/image-viewer.component';
+import { TooltipDirective } from '../../shared/tooltip.directive';
 
 type Stage = 'upload' | 'reading' | 'review' | 'confirmed';
 type Mode = 'ai' | 'manual';
@@ -14,6 +30,8 @@ interface Row {
   item: Item;
   /** The AI's original reading, to count pharmacist corrections. Null for rows added by hand. */
   orig: Item | null;
+  /** Stock-list names offered as "Did you mean…?" chips for the drug name. */
+  suggestions?: NameSuggestion[];
 }
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
@@ -24,12 +42,14 @@ const MAX_BYTES = 10 * 1024 * 1024;
 
 @Component({
   selector: 'app-scan',
-  imports: [FormsModule, RouterLink, IconComponent],
+  imports: [FormsModule, RouterLink, IconComponent, TooltipDirective, ImageViewerComponent],
   templateUrl: './scan.component.html',
   styleUrl: './scan.component.css'
 })
-export class ScanComponent implements OnDestroy {
+export class ScanComponent implements OnDestroy, HasUnsavedWork {
   private readonly api = inject(ApiService);
+  private readonly dialog = inject(ConfirmService);
+  readonly status = inject(StatusStore);
   readonly accept = ACCEPT_ATTR;
 
   readonly fields = ITEM_FIELDS;
@@ -46,6 +66,19 @@ export class ScanComponent implements OnDestroy {
     dose: 'e.g. 1 tablet',
     frequency: 'e.g. twice daily (bd)',
     duration: 'e.g. 5 days'
+  };
+  readonly hints: Record<ItemField, string> = {
+    drug_name: 'Exactly as written on the prescription (brand or generic). Checked against the stock list.',
+    strength: 'Amount of active ingredient per unit, e.g. 500 mg',
+    dose: 'How much to take each time, e.g. 1 tablet',
+    frequency: 'How often. Shorthand is expanded: bd = twice daily, tds = three times, nocte = at night, 1×2 = one twice daily',
+    duration: 'How long. 5/7 = 5 days, 2/52 = 2 weeks'
+  };
+  readonly confidenceHint = 'How sure the AI is about this row. Low rows must be checked against the photo. You can change it.';
+  readonly confidenceLabels: Record<Confidence, string> = {
+    high: 'High – clearly read',
+    medium: 'Medium – probably right',
+    low: 'Low – verify against the photo'
   };
   readonly seconds = seconds;
   readonly usd = usd;
@@ -70,20 +103,71 @@ export class ScanComponent implements OnDestroy {
   private deletedOriginals = 0;
   private nextKey = 1;
   private timer: ReturnType<typeof setInterval> | null = null;
+  private scanSub: Subscription | null = null;
 
   ngOnDestroy(): void {
+    this.scanSub?.unsubscribe();
     this.stopTimer();
     this.revokePreview();
   }
 
+  // ---- Unsaved work ------------------------------------------------------
+
+  /** True while reading, or while reviewing a list that has not been confirmed. */
+  hasUnsavedWork(): boolean {
+    if (this.stage() === 'reading') return true;
+    if (this.stage() !== 'review') return false;
+    // An AI reading always counts: it took time and cost tokens to produce.
+    return !!this.result() || this.rows.some((r) => ITEM_FIELDS.some((f) => norm(r.item[f])));
+  }
+
+  /** Route guard hook: asks before leaving the page with unconfirmed work. */
+  confirmLeave(): Promise<boolean> {
+    if (!this.hasUnsavedWork()) return Promise.resolve(true);
+    if (this.stage() === 'reading') {
+      return this.dialog.ask({
+        title: 'Stop reading this prescription?',
+        message: 'Amazon Nova is still reading the photo. If you leave now, the result will be lost.',
+        confirmText: 'Stop and leave',
+        cancelText: 'Stay',
+        danger: true
+      });
+    }
+    return this.askDiscard('Leave without confirming?', 'Leave page');
+  }
+
+  /** Browser refresh / tab close: the browser shows its own generic prompt. */
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (this.hasUnsavedWork()) event.preventDefault();
+  }
+
+  private askDiscard(title: string, confirmText: string): Promise<boolean> {
+    const n = this.rows.length;
+    const edits = this.corrections();
+    const what = this.result()
+      ? `The AI-extracted list (${n} item${n === 1 ? '' : 's'}${edits ? `, ${edits} correction${edits === 1 ? '' : 's'}` : ''})`
+      : `The ${n} manually entered item${n === 1 ? '' : 's'}`;
+    return this.dialog.ask({
+      title,
+      message: `${what} has not been confirmed and will be lost.`,
+      confirmText,
+      danger: true
+    });
+  }
+
   // ---- Mode -------------------------------------------------------------
 
-  setMode(mode: Mode): void {
+  async setMode(mode: Mode): Promise<void> {
     if (mode === this.mode() || this.stage() === 'reading') return;
+    if (this.hasUnsavedWork()) {
+      const ok = await this.askDiscard(
+        mode === 'manual' ? 'Switch to manual entry?' : 'Switch to reading a photo?',
+        mode === 'manual' ? 'Discard and enter manually' : 'Discard and upload a photo'
+      );
+      if (!ok) return;
+    }
     if (mode === 'manual') {
-      if (this.result() && this.stage() === 'review' && !window.confirm('Discard the AI reading and enter the items manually?')) {
-        return;
-      }
       this.startManual();
     } else {
       this.mode.set('ai');
@@ -186,18 +270,21 @@ export class ScanComponent implements OnDestroy {
     this.error.set(null);
     this.stage.set('reading');
     this.startTimer();
-    this.api.scan(file).subscribe({
+    this.scanSub = this.api.scan(file).subscribe({
       next: (res) => {
         this.stopTimer();
+        this.scanSub = null;
         this.result.set(res);
         this.mode.set('ai');
         this.rows = res.items.map((item) => ({ key: this.nextKey++, item: { ...item }, orig: { ...item } }));
         this.deletedOriginals = 0;
         this.invalidRows.set(new Set());
         this.stage.set('review');
+        this.loadSuggestions(this.rows);
       },
       error: (err: ApiError) => {
         this.stopTimer();
+        this.scanSub = null;
         this.error.set(err);
         if (err.fallback_to_manual) {
           this.startManual();
@@ -206,6 +293,26 @@ export class ScanComponent implements OnDestroy {
         }
       }
     });
+  }
+
+  /**
+   * Stop waiting for the AI. Unsubscribing aborts the HTTP request; the Bedrock call may still
+   * finish on the server (and be logged), but its result is ignored.
+   */
+  cancelReading(toManual: boolean): void {
+    this.scanSub?.unsubscribe();
+    this.scanSub = null;
+    this.stopTimer();
+    if (toManual) {
+      this.startManual();
+      this.error.set({
+        error_type: 'cancelled',
+        message: 'Enter the items from the photo below, or switch back to "Read from photo" to try again.',
+        fallback_to_manual: true
+      });
+    } else {
+      this.stage.set('upload');
+    }
   }
 
   private startTimer(): void {
@@ -241,6 +348,14 @@ export class ScanComponent implements OnDestroy {
 
   isChanged(row: Row, field: ItemField): boolean {
     return !!row.orig && norm(row.item[field]) !== norm(row.orig[field]);
+  }
+
+  /** Tooltip for an editable cell: the AI's original reading once edited, or a hint if it was unreadable. */
+  cellHint(row: Row, field: ItemField): string | null {
+    if (!row.orig) return null;
+    if (this.isChanged(row, field)) return `AI read: ${row.orig[field] ?? '(unreadable)'}`;
+    if (row.item[field] === null) return 'The AI could not read this field – check the photo';
+    return null;
   }
 
   setConfidence(row: Row, value: Confidence): void {
@@ -280,11 +395,64 @@ export class ScanComponent implements OnDestroy {
           this.rows[i].item.confidence = c.confidence;
         });
         this.busy.set(false);
+        this.loadSuggestions(this.rows);
       },
       error: (err: ApiError) => {
         this.error.set(err);
         this.busy.set(false);
       }
+    });
+  }
+
+  // ---- "Did you mean…?" ---------------------------------------------------------
+
+  /** Fetch stock-list suggestions for the given rows (matched by row, so edits/deletes meanwhile are safe). */
+  loadSuggestions(rows: Row[]): void {
+    const targets = rows.filter((r) => norm(r.item.drug_name));
+    rows.filter((r) => !norm(r.item.drug_name)).forEach((r) => (r.suggestions = []));
+    if (!targets.length) return;
+    this.api.nameSuggestions(targets.map((r) => norm(r.item.drug_name))).subscribe({
+      next: (lists) => targets.forEach((r, i) => (r.suggestions = lists[i] ?? [])),
+      // Suggestions are a convenience – fail quietly; the name check note still applies.
+      error: () => targets.forEach((r) => (r.suggestions = []))
+    });
+  }
+
+  /** After the drug name is edited: refresh its suggestions and its stock-list note. */
+  onDrugNameChange(row: Row): void {
+    this.loadSuggestions([row]);
+    this.refreshNote(row);
+  }
+
+  /** Show chips only when the written name is not already one of the stock names. */
+  showSuggestions(row: Row): boolean {
+    const name = norm(row.item.drug_name).toLowerCase();
+    const list = row.suggestions ?? [];
+    return list.length > 0 && !list.some((s) => s.name.toLowerCase() === name);
+  }
+
+  suggestionHint(s: NameSuggestion): string {
+    return `${s.generic_name} ${s.strength} · ${s.in_stock ? 'in stock' : 'out of stock'} · ${s.score}% match. Click to use this name.`;
+  }
+
+  /** Apply a suggestion, then re-run the name check for that row so its note matches the new name. */
+  applySuggestion(row: Row, s: NameSuggestion): void {
+    row.item.drug_name = s.name;
+    this.refreshNote(row);
+  }
+
+  /**
+   * Re-run the name check for one row and update only its note, so it never describes an old name.
+   * Confidence is left as the pharmacist set it ("Check names against stock" still re-rates every row).
+   */
+  private refreshNote(row: Row): void {
+    const name = norm(row.item.drug_name);
+    this.api.nameCheck([cleanItem(row.item)]).subscribe({
+      next: ([checked]) => {
+        // Ignore a late reply if the name changed again meanwhile.
+        if (checked && norm(row.item.drug_name) === name) row.item.note = checked.note;
+      },
+      error: () => (row.item.note = null)
     });
   }
 
@@ -320,6 +488,12 @@ export class ScanComponent implements OnDestroy {
     });
   }
 
+  /** Cancel button during review: ask first if anything would be lost. */
+  async cancelReview(): Promise<void> {
+    if (this.hasUnsavedWork() && !(await this.askDiscard('Discard this list?', 'Discard list'))) return;
+    this.startOver();
+  }
+
   startOver(): void {
     this.clearFile();
     this.rows = [];
@@ -338,6 +512,8 @@ export class ScanComponent implements OnDestroy {
         return 'Please choose another file';
       case 'validation':
         return 'Check the list';
+      case 'cancelled':
+        return 'Reading cancelled – using manual entry';
       case 'unreadable_image':
         return 'Photo could not be read';
       default:

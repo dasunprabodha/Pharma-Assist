@@ -75,7 +75,7 @@ fallback and logging paths.
 | Component | Source | Role |
 |-----------|--------|------|
 | Angular frontend | `frontend/src/app/` | Upload/camera/PDF, editable table beside the photo, low-confidence warnings, manual entry, confirm; dashboard, history, settings |
-| REST API | `backend/.../api/PrescriptionController.java` | `/api/scans`, `/api/preview`, `/api/name-check`, `/api/prescriptions`, `/api/dashboard` |
+| REST API | `backend/.../api/PrescriptionController.java` | `/api/scans`, `/api/preview`, `/api/name-check`, `/api/name-suggestions`, `/api/prescriptions`, `/api/dashboard` |
 | ImageUtils | `backend/.../image/ImageUtils.java` | Accepts JPG/PNG/WEBP/PDF ≤ 10 MB; PDF pages (≤ 3) rendered to images; EXIF orientation; **all metadata removed**; longest side ≤ 1600 px; JPEG |
 | Extractor | `backend/.../extractor/Extractor.java` | Bedrock Converse call with the image(s) + prompt, temperature 0, forced `record_prescription` tool (text-JSON fallback), one retry on invalid output, AWS errors mapped to the five error types |
 | NameCheck | `backend/.../namecheck/NameCheck.java` | Fuzzy match (WRatio ≥ 85) against brand and generic names; unknown names flagged low confidence |
@@ -88,6 +88,9 @@ fallback and logging paths.
 ## Data flow and privacy
 
 1. The upload is held in memory only (`spring.servlet.multipart.file-size-threshold=11MB`); it is never written to disk.
+   *Optional:* with `KEEP_IMAGES=true` (off by default) the **processed** image (step 2's output) of a list the pharmacist
+   **confirms** is saved to `logs/scan-images/` (git-ignored) so History can show it, and deleted automatically after
+   `IMAGE_RETENTION_DAYS` (default 7) or on request. Unconfirmed scans are dropped from memory after 30 minutes.
 2. Before anything is sent to AWS, the image is decoded and re-encoded from pixels, so EXIF/GPS data, PDF metadata and
    any PDF text layer are not transmitted – only the visible page image.
 3. The prompt tells the model to ignore the patient's name, address and age and the doctor's details, and the

@@ -42,4 +42,26 @@ class NameCheckTest {
         assertEquals(Confidence.LOW, checked.confidence());
         assertEquals(NameCheck.NO_NAME, checked.note());
     }
+
+    @Test
+    void suggestsCloseStockNamesBestFirst() {
+        var suggestions = nameCheck.suggest("Lipitr");
+        assertEquals("Lipitor", suggestions.get(0).name());
+        assertEquals("atorvastatin", suggestions.get(0).genericName());
+        assertTrue(suggestions.size() <= NameCheck.MAX_SUGGESTIONS);
+    }
+
+    @Test
+    void suggestionsAreDistinctAndTidied() {
+        // "Atorvastatin (generic)" and "atorvastatin" collapse into one "Atorvastatin" suggestion.
+        var names = nameCheck.suggest("atorvastatn").stream().map(NameCheck.Suggestion::name).toList();
+        assertEquals("Atorvastatin", names.get(0));
+        assertEquals(names.size(), names.stream().map(String::toLowerCase).distinct().count());
+    }
+
+    @Test
+    void noSuggestionsForBlankOrNonsense() {
+        assertTrue(nameCheck.suggest(" ").isEmpty());
+        assertTrue(nameCheck.suggest("Qqqqqqqqq").isEmpty());
+    }
 }

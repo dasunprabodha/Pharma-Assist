@@ -4,10 +4,11 @@ import { seconds } from '../../core/format';
 import { ApiError, BedrockCheck } from '../../core/models';
 import { StatusStore } from '../../core/status.store';
 import { IconComponent } from '../../shared/icon.component';
+import { TooltipDirective } from '../../shared/tooltip.directive';
 
 @Component({
   selector: 'app-settings',
-  imports: [IconComponent],
+  imports: [IconComponent, TooltipDirective],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
 })

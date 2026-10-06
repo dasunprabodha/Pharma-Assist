@@ -6,11 +6,12 @@ import { ApiError, Dashboard, OUTCOME_LABELS } from '../../core/models';
 import { BarItem, BarListComponent } from '../../shared/bar-list.component';
 import { ColumnChartComponent, ColumnDatum, ColumnSeries } from '../../shared/column-chart.component';
 import { IconComponent } from '../../shared/icon.component';
+import { TooltipDirective } from '../../shared/tooltip.directive';
 import { StatTileComponent } from '../../shared/stat-tile.component';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, IconComponent, StatTileComponent, ColumnChartComponent, BarListComponent],
+  imports: [RouterLink, IconComponent, TooltipDirective, StatTileComponent, ColumnChartComponent, BarListComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -27,6 +28,15 @@ export class DashboardComponent implements OnInit {
   readonly compact = compact;
   readonly dateTime = dateTime;
   readonly outcomeLabels = OUTCOME_LABELS;
+  readonly outcomeHints: Record<string, string> = {
+    success: 'The model returned a readable list of items',
+    unreadable_image: 'The model found no readable prescription in the photo',
+    invalid_image: 'Wrong file type, too large, or corrupt – never sent to the model',
+    ai_unavailable: 'Network error, timeout, throttling or a Bedrock server error',
+    config_error: 'Missing AWS credentials, no model access, or an invalid model ID',
+    invalid_response: 'The model output was not valid JSON, even after one retry',
+    error: 'An unexpected error'
+  };
 
   readonly series: ColumnSeries[] = [
     { key: 'success', label: 'Read successfully', color: 'var(--series-1)' },

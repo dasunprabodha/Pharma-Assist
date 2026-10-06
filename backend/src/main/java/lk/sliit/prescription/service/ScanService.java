@@ -8,6 +8,7 @@ import lk.sliit.prescription.config.AppConfig;
 import lk.sliit.prescription.errors.PrescriptionException;
 import lk.sliit.prescription.extractor.Extractor;
 import lk.sliit.prescription.extractor.TokenUsage;
+import lk.sliit.prescription.history.ImageStore;
 import lk.sliit.prescription.history.ScanRecord;
 import lk.sliit.prescription.history.UsageLog;
 import lk.sliit.prescription.image.ImageUtils;
@@ -23,14 +24,24 @@ public class ScanService {
     private final Extractor extractor;
     private final NameCheck nameCheck;
     private final UsageLog usageLog;
+    private final ImageStore imageStore;
 
-    public ScanService(Extractor extractor, NameCheck nameCheck, UsageLog usageLog) {
+    public ScanService(Extractor extractor, NameCheck nameCheck, UsageLog usageLog, ImageStore imageStore) {
         this.extractor = extractor;
         this.nameCheck = nameCheck;
         this.usageLog = usageLog;
+        this.imageStore = imageStore;
     }
 
     public ScanResult scan(String filename, byte[] upload) {
+        return scan(filename, upload, true);
+    }
+
+    /**
+     * @param applyNameCheck false returns the model's own confidence (used by scripts/evaluate.py to measure
+     *                       how well the model flags its own errors); the UI always applies the name check
+     */
+    public ScanResult scan(String filename, byte[] upload, boolean applyNameCheck) {
         String scanId = UUID.randomUUID().toString().substring(0, 8);
         TokenUsage usage = new TokenUsage();
         long start = System.currentTimeMillis();
@@ -38,7 +49,12 @@ public class ScanService {
         List<Item> items = List.of();
         try {
             List<byte[]> pages = ImageUtils.preparePages(filename, upload);
-            items = nameCheck.check(extractor.extractItems(pages, usage));
+            items = extractor.extractItems(pages, usage);
+            if (applyNameCheck) {
+                items = nameCheck.check(items);
+            }
+            // Held in memory only; written to disk if the list is confirmed and KEEP_IMAGES=true.
+            imageStore.holdForConfirm(scanId, pages);
             long latency = System.currentTimeMillis() - start;
             return new ScanResult(scanId, extractor.modelId(), pages.size(), items, lowRows(items), usage.inputTokens(),
                     usage.outputTokens(), latency, cost(usage.inputTokens(), usage.outputTokens()));

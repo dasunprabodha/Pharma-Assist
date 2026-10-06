@@ -3,10 +3,11 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/api.service';
 import { RuleRow, StockRow } from '../../core/models';
 import { IconComponent } from '../../shared/icon.component';
+import { TooltipDirective } from '../../shared/tooltip.directive';
 
 @Component({
   selector: 'app-stock',
-  imports: [FormsModule, IconComponent],
+  imports: [FormsModule, IconComponent, TooltipDirective],
   templateUrl: './stock.component.html',
   styleUrl: './stock.component.css'
 })

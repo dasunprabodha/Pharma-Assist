@@ -3,7 +3,7 @@
     <h1>History</h1>
     <p>Pharmacist-confirmed prescription lists. Drug items only – no patient details are stored.</p>
   </div>
-  <button type="button" class="btn" (click)="exportCsv()" [disabled]="!filtered().length"><app-icon name="download" [size]="16" /> Export CSV</button>
+  <button type="button" class="btn" (click)="exportCsv()" [disabled]="!filtered().length" appTooltip="Download the lists shown below (current filter) as a CSV file"><app-icon name="download" [size]="16" /> Export CSV</button>
 </div>
 
 @if (error(); as err) {
@@ -18,8 +18,8 @@
     </label>
     <div class="segmented" role="tablist" aria-label="Filter by source">
       <button type="button" [class.on]="source() === 'all'" (click)="source.set('all')">All</button>
-      <button type="button" [class.on]="source() === 'ai'" (click)="source.set('ai')">AI-extracted</button>
-      <button type="button" [class.on]="source() === 'manual'" (click)="source.set('manual')">Manual</button>
+      <button type="button" [class.on]="source() === 'ai'" (click)="source.set('ai')" appTooltip="Lists read by Amazon Nova and confirmed by the pharmacist">AI-extracted</button>
+      <button type="button" [class.on]="source() === 'manual'" (click)="source.set('manual')" appTooltip="Lists typed in manually">Manual</button>
     </div>
     <span class="muted small count">{{ filtered().length }} of {{ all().length }}</span>
   </div>
@@ -40,19 +40,41 @@
             <app-icon name="chevron" [size]="16" class="chev" />
             <span class="when">{{ dateTime(p.confirmed_at) }}</span>
             @if (p.source === 'ai') {
-              <span class="badge info"><app-icon name="sparkle" [size]="12" /> AI</span>
+              <span class="badge info" appTooltip="AI-extracted"><app-icon name="sparkle" [size]="12" /> AI</span>
             } @else {
-              <span class="badge"><app-icon name="edit" [size]="12" /> Manual</span>
+              <span class="badge" appTooltip="Manual entry"><app-icon name="edit" [size]="12" /> Manual</span>
             }
             <span class="drugs">{{ summary(p) }}</span>
+            <span class="has-img" [class.on]="(p.image_pages ?? 0) > 0" [appTooltip]="(p.image_pages ?? 0) > 0 ? 'Prescription image saved' : null">
+              @if ((p.image_pages ?? 0) > 0) { <app-icon name="image" [size]="16" /> }
+            </span>
             <span class="meta">
               {{ p.items.length }} item{{ p.items.length === 1 ? '' : 's' }}
               @if (p.source === 'ai') { · {{ p.corrections }} correction{{ p.corrections === 1 ? '' : 's' }} }
             </span>
-            <code class="muted">{{ p.id }}</code>
+            <code class="muted" appTooltip="Confirmation reference">{{ p.id }}</code>
           </button>
           @if (expanded().has(p.id)) {
-            <div class="detail table-wrap">
+            <div class="detail">
+              <div class="image-col">
+                @if ((p.image_pages ?? 0) > 0) {
+                  <app-image-viewer [pages]="imageUrls(p)" label="Prescription image for this list" (enlarge)="lightbox.set(imageUrls(p))" />
+                  <div class="image-meta">
+                    <span class="muted small">{{ expiryText(p) }}</span>
+                    <button type="button" class="btn ghost danger sm" (click)="deleteImage(p)"
+                            appTooltip="Delete the saved image now. The drug list is kept.">
+                      <app-icon name="trash" [size]="14" /> Delete image
+                    </button>
+                  </div>
+                } @else {
+                  <div class="no-image">
+                    <app-icon name="image" [size]="22" />
+                    <strong>No image</strong>
+                    <span>{{ noImageReason(p) }}</span>
+                  </div>
+                }
+              </div>
+              <div class="table-wrap">
               <table class="data">
                 <thead><tr><th>#</th><th>Drug name</th><th>Strength</th><th>Dose</th><th>Frequency</th><th>Duration</th><th>Confidence</th><th>Note</th></tr></thead>
                 <tbody>
@@ -70,6 +92,7 @@
                   }
                 </tbody>
               </table>
+              </div>
             </div>
           }
         </li>
@@ -86,3 +109,14 @@
     }
   }
 </section>
+
+@if (lightbox(); as pages) {
+  <div class="lightbox" (click)="lightbox.set(null)" role="dialog" aria-label="Enlarged prescription image">
+    <button type="button" class="icon-btn close" aria-label="Close" appTooltip="Close (or click anywhere)" tooltipPlacement="left"><app-icon name="x" /></button>
+    <div class="lightbox-pages" [class.multi]="pages.length > 1">
+      @for (src of pages; track $index) {
+        <img [src]="src" [alt]="'Enlarged page ' + ($index + 1)" (click)="$event.stopPropagation()" />
+      }
+    </div>
+  </div>
+}
