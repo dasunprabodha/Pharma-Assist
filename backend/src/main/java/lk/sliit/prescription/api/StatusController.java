@@ -5,6 +5,7 @@ import java.util.Map;
 import lk.sliit.prescription.config.AppConfig;
 import lk.sliit.prescription.config.BedrockClients;
 import lk.sliit.prescription.data.DataLoader;
+import lk.sliit.prescription.errors.DataError;
 import lk.sliit.prescription.history.ImageStore;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.ContentBlock;
@@ -41,8 +42,14 @@ public class StatusController {
         status.put("model_id", AppConfig.modelId());
         status.put("model_id_set", AppConfig.isModelIdSet());
         status.put("prompt_version", AppConfig.promptVersion());
-        status.put("stock_items", data.stock().size());
-        status.put("interaction_rules", data.rules().size());
+        try {
+            status.put("stock_items", data.stock().size());
+            status.put("interaction_rules", data.rules().size());
+        } catch (DataError e) {
+            status.put("stock_items", null);
+            status.put("interaction_rules", null);
+            status.put("data_error", e.getMessage());
+        }
         status.put("keep_images", imageStore.enabled());
         status.put("image_retention_days", imageStore.retentionDays());
         return status;

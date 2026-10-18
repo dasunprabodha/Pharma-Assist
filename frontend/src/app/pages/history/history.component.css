@@ -87,3 +87,5 @@ li.open .chev { transform: rotate(90deg); }
   .summary .meta, .summary code { grid-column: 2 / -1; }
 }
 .more { display: flex; justify-content: center; margin-top: 14px; }
+
+.check-row { margin-top: 12px; }

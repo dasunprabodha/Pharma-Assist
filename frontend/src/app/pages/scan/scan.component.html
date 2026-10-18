@@ -210,12 +210,19 @@
                         {{ row.item.note }}
                       </div>
                     }
+                    @if (f === 'drug_name' && row.stockMatch; as m) {
+                      <div class="stock-pack">
+                        <app-drug-thumb [src]="m.image_url" [label]="m.brand_name + ' ' + m.strength" size="sm" />
+                        <span>Pack: <strong>{{ m.brand_name }}</strong> {{ m.strength }}{{ m.in_stock ? '' : ' · out of stock' }}</span>
+                      </div>
+                    }
                     @if (f === 'drug_name' && showSuggestions(row)) {
                       <div class="suggest">
                         <span class="suggest-label">Did you mean</span>
                         @for (s of row.suggestions; track s.name) {
                           <button type="button" class="chip" [class.oos]="!s.in_stock" (click)="applySuggestion(row, s)"
                                   [appTooltip]="suggestionHint(s)" [attr.aria-label]="'Use ' + s.name + ' as the drug name for row ' + (i + 1)">
+                            @if (s.item_id) { <img class="chip-img" [src]="'/api/stock/' + s.item_id + '/image'" alt="" /> }
                             {{ s.name }}
                           </button>
                         }
@@ -300,10 +307,7 @@
         </tbody>
       </table>
     </div>
-    <div class="alert info next">
-      <app-icon name="info" />
-      <p>This confirmed list is the input to the dispensing check (stock, generics and interactions), which arrives in Feature 2.</p>
-    </div>
+    <app-dispensing-check [items]="c.items" [reference]="c.id" />
     <div class="actions">
       <a routerLink="/history" class="btn">View history</a>
       <span class="grow"></span>

@@ -2,6 +2,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import {
+  Checklist,
+  StockMatch,
   ApiError,
   BedrockCheck,
   ConfigStatus,
@@ -47,6 +49,16 @@ export class ApiService {
   /** Up to three stock-list names per drug name, best first. */
   nameSuggestions(names: string[]): Observable<NameSuggestion[][]> {
     return this.http.post<NameSuggestion[][]>('/api/name-suggestions', names).pipe(catchError(toApiError));
+  }
+
+  /** The stock item each name resolves to (null when not in the stock list). */
+  stockMatches(rows: { drug_name: string; strength: string | null }[]): Observable<(StockMatch | null)[]> {
+    return this.http.post<(StockMatch | null)[]>('/api/stock-matches', rows).pipe(catchError(toApiError));
+  }
+
+  /** Feature 2: dispensing check for a confirmed list (AI-extracted or manual). */
+  check(items: Item[]): Observable<Checklist> {
+    return this.http.post<Checklist>('/api/check', { items }).pipe(catchError(toApiError));
   }
 
   confirm(source: Source, scanId: string | null, items: Item[], corrections: number): Observable<ConfirmedPrescription> {

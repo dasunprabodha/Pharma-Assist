@@ -28,6 +28,7 @@ export interface ScanResult {
 
 /** A stock-list name offered for a drug name ("Did you mean…?"). */
 export interface NameSuggestion {
+  item_id: string;
   name: string;
   generic_name: string;
   strength: string;
@@ -149,3 +150,60 @@ export const OUTCOME_LABELS: Record<string, string> = {
   invalid_response: 'Unexpected AI result',
   error: 'Other error'
 };
+
+/** The stock item a drug name resolves to (same matcher as the dispensing check). */
+export interface StockMatch {
+  item_id: string;
+  brand_name: string;
+  generic_name: string;
+  strength: string;
+  in_stock: boolean;
+  score: number;
+  image_url: string;
+}
+
+/** Feature 2 – dispensing checklist (drug items only, no patient data). */
+export interface ChecklistAlternative {
+  item_id: string;
+  brand_name: string;
+  generic_name: string;
+  strength: string;
+  quantity_on_hand: number;
+  same_strength: boolean;
+  image_url: string;
+}
+
+export interface ChecklistRow {
+  index: number;
+  prescribed: string;
+  dose: string | null;
+  frequency: string | null;
+  duration: string | null;
+  item_id: string | null;
+  matched_product: string | null;
+  generic_name: string | null;
+  therapeutic_class: string | null;
+  stock_strength: string | null;
+  dosage_form: string | null;
+  status: 'in_stock' | 'out_of_stock' | 'not_in_list';
+  quantity_on_hand: number | null;
+  match_score: number | null;
+  alternatives: ChecklistAlternative[];
+  notes: string[];
+  image_url: string | null;
+}
+
+export interface ChecklistWarning {
+  severity: 'major' | 'moderate' | 'minor';
+  rule_id: string | null;
+  rule_type: 'interaction' | 'duplicate_class' | 'duplicate_generic' | 'not_in_stock_list';
+  items: string[];
+  rows: number[];
+  message: string;
+}
+
+export interface Checklist {
+  checked_at: string;
+  rows: ChecklistRow[];
+  warnings: ChecklistWarning[];
+}

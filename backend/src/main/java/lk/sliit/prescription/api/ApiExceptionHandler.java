@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import lk.sliit.prescription.errors.AIUnavailableError;
 import lk.sliit.prescription.errors.ConfigError;
+import lk.sliit.prescription.errors.DataError;
 import lk.sliit.prescription.errors.InvalidImageError;
 import lk.sliit.prescription.errors.InvalidResponseError;
 import lk.sliit.prescription.errors.PrescriptionException;
@@ -31,7 +32,7 @@ public class ApiExceptionHandler {
             status = HttpStatus.UNPROCESSABLE_ENTITY;
         } else if (e instanceof InvalidResponseError) {
             status = HttpStatus.BAD_GATEWAY;
-        } else if (e instanceof ConfigError || e instanceof AIUnavailableError) {
+        } else if (e instanceof ConfigError || e instanceof AIUnavailableError || e instanceof DataError) {
             status = HttpStatus.SERVICE_UNAVAILABLE;
         } else {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -49,7 +50,9 @@ public class ApiExceptionHandler {
 
     /** The user-facing messages from CLAUDE.md 6.5. */
     static String userMessage(PrescriptionException e) {
-        if (e instanceof ConfigError) {
+        if (e instanceof DataError) {
+            return "Stock/rule data unavailable – the dispensing check cannot run";
+        } else if (e instanceof ConfigError) {
             return "AI not configured (AWS credentials or Bedrock model access) – using manual entry";
         } else if (e instanceof AIUnavailableError) {
             return "AI service unavailable – using manual entry";

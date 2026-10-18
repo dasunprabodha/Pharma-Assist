@@ -195,7 +195,7 @@ select.cell { min-width: 92px; cursor: pointer; }
 .actions { display: flex; align-items: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
 
 /* Confirmed */
-.confirmed { max-width: 900px; }
+.confirmed { max-width: 1240px; }
 .confirmed-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
 .confirmed-head h2 { font-size: 18px; }
 .confirmed-head p { margin: 2px 0 0; }
@@ -220,3 +220,8 @@ select.cell { min-width: 92px; cursor: pointer; }
   .image-panel { position: static; }
   .image-panel { --viewer-height: 340px; }
 }
+
+/* Pack image of the matched stock item (illustration unless the pharmacy adds photos) */
+.stock-pack { display: flex; align-items: center; gap: 7px; padding: 0 9px 6px; font-size: 11.5px; color: var(--text-secondary); }
+.chip { display: inline-flex; align-items: center; gap: 5px; }
+.chip-img { width: 24px; height: 14px; object-fit: contain; background: #fff; border-radius: 2px; }

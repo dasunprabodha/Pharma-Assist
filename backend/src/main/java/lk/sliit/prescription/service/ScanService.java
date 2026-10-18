@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import lk.sliit.prescription.config.AppConfig;
+import lk.sliit.prescription.errors.DataError;
 import lk.sliit.prescription.errors.PrescriptionException;
 import lk.sliit.prescription.extractor.Extractor;
 import lk.sliit.prescription.extractor.TokenUsage;
@@ -51,7 +52,12 @@ public class ScanService {
             List<byte[]> pages = ImageUtils.preparePages(filename, upload);
             items = extractor.extractItems(pages, usage);
             if (applyNameCheck) {
-                items = nameCheck.check(items);
+                try {
+                    items = nameCheck.check(items);
+                } catch (DataError e) {
+                    // Stock list unavailable: still return the reading - the names are simply not checked.
+                    items = items.stream().map(i -> i.withNote("Stock list unavailable – name not checked")).toList();
+                }
             }
             // Held in memory only; written to disk if the list is confirmed and KEEP_IMAGES=true.
             imageStore.holdForConfirm(scanId, pages);

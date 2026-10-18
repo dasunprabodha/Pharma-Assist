@@ -7,12 +7,13 @@ import { dateTime } from '../../core/format';
 import { StatusStore } from '../../core/status.store';
 import { ApiError, ConfirmedPrescription } from '../../core/models';
 import { IconComponent } from '../../shared/icon.component';
+import { DispensingCheckComponent } from '../../shared/dispensing-check.component';
 import { ImageViewerComponent } from '../../shared/image-viewer.component';
 import { TooltipDirective } from '../../shared/tooltip.directive';
 
 @Component({
   selector: 'app-history',
-  imports: [FormsModule, RouterLink, IconComponent, TooltipDirective, ImageViewerComponent],
+  imports: [FormsModule, RouterLink, IconComponent, TooltipDirective, ImageViewerComponent, DispensingCheckComponent],
   templateUrl: './history.component.html',
   styleUrl: './history.component.css'
 })
@@ -58,6 +59,13 @@ export class HistoryComponent implements OnInit {
   }
 
   readonly shown = computed(() => this.filtered().slice(0, this.visible()));
+
+  /** Lists whose dispensing check is shown (Feature 2 can be re-run on any confirmed list). */
+  readonly checking = signal<Set<string>>(new Set());
+
+  startCheck(id: string): void {
+    this.checking.set(new Set(this.checking()).add(id));
+  }
 
   toggle(id: string): void {
     const next = new Set(this.expanded());

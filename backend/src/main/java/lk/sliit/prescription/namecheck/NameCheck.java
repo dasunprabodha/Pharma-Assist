@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.Set;
 import lk.sliit.prescription.data.DataLoader;
 import lk.sliit.prescription.model.Confidence;
@@ -29,7 +32,12 @@ public class NameCheck {
     public static final int MAX_SUGGESTIONS = 3;
 
     /** A stock-list name the pharmacist can pick for a drug name ("Did you mean…?"). */
-    public record Suggestion(String name, String genericName, String strength, boolean inStock, int score) {
+    public record Suggestion(String itemId, String name, String genericName, String strength, boolean inStock,
+                             int score) {
+    }
+
+    /** The stock row a drug name resolves to, with its WRatio score (0-100). */
+    public record Match(Map<String, String> row, int score) {
     }
 
     private final List<String> names = new ArrayList<>();
@@ -37,16 +45,66 @@ public class NameCheck {
     /** Display form of each entry in names, e.g. "Lipitor", "Atorvastatin". */
     private final List<String> displayNames = new ArrayList<>();
 
+    /** The stock list is read on first use, so a missing CSV raises DataError there instead of at startup. */
+    private final Supplier<List<Map<String, String>>> stockSource;
+    private volatile boolean indexed;
+
     @Autowired
     public NameCheck(DataLoader data) {
-        this(data.stock());
+        this.stockSource = data::stock;
     }
 
     public NameCheck(List<Map<String, String>> stock) {
-        for (Map<String, String> row : stock) {
+        this.stockSource = () -> stock;
+    }
+
+    private synchronized void ensureIndex() {
+        if (indexed) {
+            return;
+        }
+        for (Map<String, String> row : stockSource.get()) {
             add(row.get("brand_name"), row);
             add(row.get("generic_name"), row);
         }
+        indexed = true;
+    }
+
+    /**
+     * Resolves a drug name to a stock row (WRatio ≥ {@value #MATCH_THRESHOLD}), or empty. When several names score
+     * equally (e.g. "Atorvastatin" is both Lipitor's generic and the generic product), the row whose strength
+     * matches the prescribed strength wins, then an in-stock row.
+     */
+    public Optional<Match> match(String drugName, String prescribedStrength) {
+        if (drugName == null || drugName.isBlank()) {
+            return Optional.empty();
+        }
+        ensureIndex();
+        List<ExtractedResult> results = FuzzySearch.extractSorted(drugName.toLowerCase(), names);
+        if (results.isEmpty() || results.get(0).getScore() < MATCH_THRESHOLD) {
+            return Optional.empty();
+        }
+        int best = results.get(0).getScore();
+        String strength = firstNumber(prescribedStrength);
+        Comparator<Map<String, String>> preference = Comparator
+                .comparing((Map<String, String> r) -> strength != null && strength.equals(firstNumber(r.get("strength"))))
+                .thenComparing(r -> "yes".equalsIgnoreCase(r.get("in_stock")));
+        return results.stream()
+                .filter(r -> r.getScore() == best)
+                .map(r -> rowForName.get(r.getIndex()))
+                .max(preference)
+                .map(row -> new Match(row, best));
+    }
+
+    public Optional<Match> match(String drugName) {
+        return match(drugName, null);
+    }
+
+    static String firstNumber(String s) {
+        if (s == null) {
+            return null;
+        }
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\d+(?:\\.\\d+)?").matcher(s);
+        return m.find() ? m.group() : null;
     }
 
     private void add(String name, Map<String, String> row) {
@@ -65,13 +123,13 @@ public class NameCheck {
         if (item.drugName() == null || item.drugName().isBlank()) {
             return item.withConfidence(Confidence.LOW).withNote(NO_NAME);
         }
-        ExtractedResult best = FuzzySearch.extractOne(item.drugName().toLowerCase(), names);
-        if (best == null || best.getScore() < MATCH_THRESHOLD) {
+        Optional<Match> match = match(item.drugName(), item.strength());
+        if (match.isEmpty()) {
             return item.withConfidence(Confidence.LOW).withNote(NOT_FOUND);
         }
-        Map<String, String> row = rowForName.get(best.getIndex());
+        Map<String, String> row = match.get().row();
         return item.withNote("Stock list: " + row.get("brand_name") + " (" + row.get("generic_name") + " "
-                + row.get("strength") + ") – match " + best.getScore() + "%");
+                + row.get("strength") + ") – match " + match.get().score() + "%");
     }
 
     /**
@@ -82,6 +140,7 @@ public class NameCheck {
         if (drugName == null || drugName.isBlank()) {
             return List.of();
         }
+        ensureIndex();
         List<Suggestion> out = new ArrayList<>();
         Set<String> seen = new LinkedHashSet<>();
         for (ExtractedResult r : FuzzySearch.extractSorted(drugName.toLowerCase(), names)) {
@@ -91,7 +150,7 @@ public class NameCheck {
             String name = displayNames.get(r.getIndex());
             if (seen.add(name.toLowerCase(Locale.ROOT))) {
                 Map<String, String> row = rowForName.get(r.getIndex());
-                out.add(new Suggestion(name, row.get("generic_name"), row.get("strength"),
+                out.add(new Suggestion(row.get("item_id"), name, row.get("generic_name"), row.get("strength"),
                         "yes".equalsIgnoreCase(row.get("in_stock")), r.getScore()));
             }
         }

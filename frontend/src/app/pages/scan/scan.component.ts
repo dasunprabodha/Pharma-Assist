@@ -15,11 +15,14 @@ import {
   ItemField,
   NameSuggestion,
   ScanResult,
-  Source
+  Source,
+  StockMatch
 } from '../../core/models';
 import { HasUnsavedWork } from '../../core/unsaved-changes.guard';
 import { IconComponent } from '../../shared/icon.component';
 import { ImageViewerComponent } from '../../shared/image-viewer.component';
+import { DrugThumbComponent } from '../../shared/drug-thumb.component';
+import { DispensingCheckComponent } from '../../shared/dispensing-check.component';
 import { TooltipDirective } from '../../shared/tooltip.directive';
 
 type Stage = 'upload' | 'reading' | 'review' | 'confirmed';
@@ -32,6 +35,8 @@ interface Row {
   orig: Item | null;
   /** Stock-list names offered as "Did you mean…?" chips for the drug name. */
   suggestions?: NameSuggestion[];
+  /** The stock item this name resolves to (same matcher as the dispensing check) – shown with its pack image. */
+  stockMatch?: StockMatch | null;
 }
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
@@ -42,7 +47,7 @@ const MAX_BYTES = 10 * 1024 * 1024;
 
 @Component({
   selector: 'app-scan',
-  imports: [FormsModule, RouterLink, IconComponent, TooltipDirective, ImageViewerComponent],
+  imports: [FormsModule, RouterLink, IconComponent, TooltipDirective, ImageViewerComponent, DrugThumbComponent, DispensingCheckComponent],
   templateUrl: './scan.component.html',
   styleUrl: './scan.component.css'
 })
@@ -415,6 +420,10 @@ export class ScanComponent implements OnDestroy, HasUnsavedWork {
       next: (lists) => targets.forEach((r, i) => (r.suggestions = lists[i] ?? [])),
       // Suggestions are a convenience – fail quietly; the name check note still applies.
       error: () => targets.forEach((r) => (r.suggestions = []))
+    });
+    this.api.stockMatches(targets.map((r) => ({ drug_name: norm(r.item.drug_name), strength: r.item.strength }))).subscribe({
+      next: (matches) => targets.forEach((r, i) => (r.stockMatch = matches[i] ?? null)),
+      error: () => targets.forEach((r) => (r.stockMatch = null))
     });
   }
 

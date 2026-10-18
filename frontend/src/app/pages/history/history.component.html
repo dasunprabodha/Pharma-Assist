@@ -93,6 +93,13 @@
                 </tbody>
               </table>
               </div>
+              <div class="check-row">
+                @if (checking().has(p.id)) {
+                  <app-dispensing-check [items]="p.items" [reference]="p.id" />
+                } @else {
+                  <button type="button" class="btn" (click)="startCheck(p.id)"><app-icon name="shield" [size]="16" /> Run dispensing check</button>
+                }
+              </div>
             </div>
           }
         </li>

@@ -107,7 +107,7 @@ class PrescriptionControllerTest {
     @Test
     void nameSuggestionsReturnOneListPerName() throws Exception {
         when(nameCheck.suggest("Lipitr")).thenReturn(
-                java.util.List.of(new NameCheck.Suggestion("Lipitor", "atorvastatin", "20 mg", false, 92)));
+                java.util.List.of(new NameCheck.Suggestion("S024", "Lipitor", "atorvastatin", "20 mg", false, 92)));
         when(nameCheck.suggest("")).thenReturn(java.util.List.of());
         mvc.perform(post("/api/name-suggestions").contentType(MediaType.APPLICATION_JSON).content("[\"Lipitr\", \"\"]"))
                 .andExpect(status().isOk())
