@@ -26,8 +26,9 @@ flowchart TD
         table["Editable table<br/>pharmacist reviews and corrects"]
         manual["Manual entry form"]
         confirmed[["Confirmed list<br/>same Item structure"]]
-        checker["Checker – Feature 2<br/>stock, generics, interactions"]
-        checklist["Dispensing checklist"]
+        checker["Checker – Feature 2<br/>stock, generic alternatives,<br/>interaction and duplicate rules"]
+        checklist["Dispensing checklist<br/>warnings · Checked boxes · CSV"]
+        packs["DrugImages<br/>pack image per stock item"]
         logs[("logs/usage.csv<br/>tokens, latency, outcome")]
     end
 
@@ -54,20 +55,20 @@ flowchart TD
     stock --> checker
     rules --> checker
     checker --> checklist
+    packs -.->|"pack to dispense"| checklist
+    packs -.-> table
     checklist --> user
 
     classDef external fill:#fff3e0,stroke:#e8590c,color:#000
     classDef simulated fill:#f3f0ff,stroke:#7048e8,stroke-dasharray:5 3,color:#000
-    classDef planned fill:#f1f3f5,stroke:#868e96,stroke-dasharray:3 3,color:#000
     classDef fallback fill:#fff9db,stroke:#f08c00,color:#000
     class bedrock external
     class stock,rules simulated
-    class checker,checklist planned
     class manual fallback
 ```
 
 **Legend:** orange = external AWS service (Amazon Bedrock) · purple dashed = **simulated** data (CSV files, not a
-clinical database) · grey dashed = Feature 2, planned for Week 3 · yellow = manual-entry fallback · dotted arrows =
+clinical database) · yellow = manual-entry fallback · dotted arrows =
 fallback and logging paths.
 
 ## Components
@@ -81,7 +82,8 @@ fallback and logging paths.
 | NameCheck | `backend/.../namecheck/NameCheck.java` | Fuzzy match (WRatio ≥ 85) against brand and generic names; unknown names flagged low confidence |
 | Usage log | `backend/.../history/UsageLog.java` | One row per scan in `logs/usage.csv`: outcome, item counts, input/output tokens, latency – the measured input to `scripts/cost_estimate.py` |
 | Confirmed store | `backend/.../history/ConfirmedStore.java` | Confirmed drug lists (no patient details) in `logs/confirmed.jsonl` |
-| Checker *(Week 3)* | planned | Stock status, in-stock generic alternatives, interaction / duplicate-class / duplicate-ingredient warnings |
+| Checker (Feature 2) | `backend/.../checker/Checker.java`, `api/CheckController.java` | Resolves each confirmed item with the same matcher as NameCheck; stock status; in-stock alternatives with the same generic (same strength first); interaction, duplicate-class and duplicate-ingredient rules; unmatched items warned ("not checked"); strength mismatches noted. `POST /api/check` |
+| DrugImages | `backend/.../image/DrugImages.java` | `GET /api/stock/{id}/image`: the pharmacy's own photo from `data/drug_images/<id>.jpg` if present, otherwise a generated, labelled illustration (brand, generic, strength, colour by form). Shown as the "pack to dispense" in the checklist and under matched names in the review table |
 | Amazon Bedrock | AWS, external | Amazon Nova 2 Lite via the `us.amazon.nova-2-lite-v1:0` inference profile; model ID is a setting (`BEDROCK_MODEL_ID`) |
 | Stock list, rules | `data/*.csv` | **Simulated** proof-of-concept data |
 
@@ -109,7 +111,8 @@ fallback and logging paths.
 | No credentials, access denied, invalid model ID | Extractor → `ConfigError` | "AI not configured … – using manual entry" |
 | Network error, timeout, throttling, Bedrock server error | Extractor → `AIUnavailableError` | "AI service unavailable – using manual entry" |
 | Model says nothing readable | Extractor → `UnreadableImageError` | "Could not read this photo – please retake it, or enter the items manually" |
-| Output not valid JSON twice | Extractor → `InvalidResponseError` | "AI returned an unexpected result – using manual entry" |
+| Output not valid JSON twice, or Bedrock `ModelErrorException` twice | Extractor → `InvalidResponseError` | "AI returned an unexpected result – using manual entry" |
+| Stock list or rules missing / malformed | DataLoader → `DataError` | "Stock/rule data unavailable" – the confirmed list is still shown; the app still starts |
 
 In every AI failure case the app switches to the manual-entry form, which produces the same confirmed list, so the
 dispensing check always remains available.

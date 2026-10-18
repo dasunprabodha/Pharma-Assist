@@ -1,19 +1,20 @@
-# Feasibility study – draft
+# Feasibility study
 
 Prescription Reader for Dulnitha Pharmacy, Kottawa – IT6070 Assignment II (U.W.D.P. Amarasinghe, MS25903874)
 
-> **Status: draft (Week 2, 05/10/2026).** Figures are labelled:
+> **Status: final (18/10/2026).** Figures are labelled:
 > **[Measured]** – from this proof of concept (`logs/usage.csv`, test runs) ·
 > **[Pharmacist estimate]** – from the discussion with "Pharmacist A" on 30/09/2026 ·
 > **[Assumption]** – a setting to be confirmed · **[Price]** – published AWS price, to verify before submission.
-> Measured figures so far come from **one** synthetic test scan, so they are indicative only; they will be updated
-> after the accuracy evaluation on 10–15 samples (Week 3).
+> Measured figures come from 67 Nova 2 Lite scans and the accuracy evaluation on 9 redacted Sri Lankan
+> prescriptions (`docs/evaluation.md`) – a small sample, so they are indicative only.
 
 ## Summary
 
 Reading handwritten prescriptions with Amazon Nova 2 Lite is technically feasible and cheap to run: about
-**LKR 3,000–5,000 per month** for 150 handwritten prescriptions a day, plus about **LKR 25,000** setup.
-It covers its running cost if it saves roughly **8–13 seconds of staff time per prescription**. Whether it does depends
+**about LKR 5,900 per month** (LKR 1.31 per prescription) for 150 handwritten prescriptions a day, plus about
+**LKR 25,000** setup.
+It covers its running cost if it saves roughly **16 seconds of staff time per prescription**. Whether it does depends
 on reading accuracy on real local handwriting, which has not been measured yet. The recommendation is a short pilot
 with the pharmacist before any purchase decision.
 
@@ -55,7 +56,7 @@ built and covered by 46 automated tests with a mocked AI client [Measured].
 |------|----------------|------|---------------------|
 | 1 | 26/09/2026 | Professional and problem – presentation, progress form | Done |
 | 2 | 03/10/2026 | Design and feasibility – scaffold, architecture, cost and feasibility draft, Feature 1 started | Done; Feature 1 built ahead of plan; TC1–TC3 pending samples |
-| 3 | 10/10/2026 | Implementation and testing – Feature 1 finished (stable by 14/10), Feature 2, tests, accuracy evaluation | Planned |
+| 3 | 10/10/2026 | Implementation and testing – Feature 1 finished (stable by 14/10), Feature 2, tests, accuracy evaluation | Done (Feature 2 completed 18/10) |
 | 4 | 17/10/2026 | Final readiness – README, ZIP and repo, 4-page report, AI declaration, demo video (≤ 3 min) | Planned |
 
 A production pilot would need about 2–4 weeks more: hosting, HTTPS, login, the real stock export and staff
@@ -128,44 +129,64 @@ training [Assumption].
 | Risk | Likelihood / impact | Mitigation |
 |------|---------------------|------------|
 | Misread drug name or dose leads to a dispensing error | Medium / High | Pharmacist confirms every item; low-confidence and unknown-name flags; model told not to guess; "decision support only" shown on every page |
-| Poor accuracy on local handwriting | Medium / High | Measure in Week 3; switch to Nova Pro via `BEDROCK_MODEL_ID`; refine the prompt; manual entry always available |
+| Poor accuracy on local handwriting | High / High (measured: ~half of names on dense cursive) | Measured in `docs/evaluation.md`; switch to Nova Pro via `BEDROCK_MODEL_ID`; refine the prompt; manual entry always available |
 | Patient data exposure or PDPA non-compliance | Low / High | No storage of images or patient details; metadata stripped; least-privilege IAM; legal check of cross-border transfer before real use |
 | Leaked AWS credentials | Low / Medium | Keys only in the AWS CLI profile; `.env` git-ignored; history scan before submission; key rotation |
-| Unexpected AWS bill | Low / Low | Budget alert at USD 5; per-scan cost about LKR 0.2–0.6 [Measured/Assumption]; token usage logged per scan |
+| Unexpected AWS bill | Low / Low | Budget alert at USD 5; per-scan AI cost about LKR 0.33 [Measured]; token usage logged per scan |
 | Bedrock outage, throttling or no internet | Low / Medium | Automatic fallback to manual entry; retries; the checker works on manual lists too |
 | Model ID or price changes | Medium / Low | Model and prices are settings; cost script re-run from measured usage |
 | Staff do not adopt it | Medium / Medium | Short training; the camera flow on a phone; a pilot to show the time saving first |
 
 ## Cost summary
 
-From `python3 scripts/cost_estimate.py` (05/10/2026; 150 handwritten prescriptions/day × 30 days = 4,500 scans/month
-[Assumption]; USD 1 = LKR 300 [Assumption]):
+From `python3 scripts/cost_estimate.py` (18/10/2026). Volume: 150 handwritten prescriptions/day × 30 days = 4,500
+scans/month [Assumption]; USD 1 = LKR 300 [Assumption]; tokens per scan 1,761 in / 179 out [Measured, 67 Nova 2 Lite
+scans]; Nova 2 Lite USD 0.33 / 2.75 per 1M input / output tokens [Price – verify].
 
-| Item | LKR/month | Basis |
-|------|-----------|-------|
-| Bedrock Nova 2 Lite | 970 – 2,747 | 1,536 in / 77 out tokens per scan [Measured, n = 1] to 2,000 / 500 [Assumption]; USD 0.33 / 2.75 per 1M tokens [Price] |
-| AWS Lightsail host | 2,100 | USD 7/month [Price] |
-| **Total recurring** | **3,070 – 4,847** | |
-| One-off setup | 25,000 | [Assumption] |
-| Lower-cost alternative: Nova Lite (v1) | ~2,250 | USD 0.06 / 0.24 per 1M tokens [Price – verify]; accuracy not tested |
-| Lower-cost alternative: manual only | 0 | No time saving |
-| Value of time saved | 22,500 | 1 min × 150/day × 30 days × LKR 300/h [Assumption] |
+| One-off setup | LKR | Basis |
+|---------------|-----|-------|
+| Devices – the pharmacy's existing PC and phone | 0 | [Assumption] |
+| Installation & configuration (AWS account, server, HTTPS, login) | 15,000 | [Assumption] |
+| Stock-list export / integration (replaces the simulated CSV) | 5,000 | [Assumption] |
+| Staff training (about 2 hours) | 5,000 | [Assumption] |
+| Software licences (open source) | 0 | Free licences |
+| **Total setup** | **25,000** | |
 
-**Break-even:** recurring cost is LKR 0.7–1.1 per scan, and staff time costs LKR 5 per minute [Assumption]. So the
-tool covers its running cost if it saves about **8–13 seconds per prescription** [derived]. The one-off setup is
-repaid in about 1–2 months if the 1-minute assumption holds [derived].
+| Recurring, per month | LKR | Basis |
+|----------------------|-----|-------|
+| Amazon Bedrock – Nova 2 Lite (4,500 scans, incl. 3% failed scans) | 1,492 | [Measured] tokens × [Price] |
+| AWS Lightsail server (USD 7) | 2,100 | [Price] |
+| Domain name (HTTPS certificate free) | 300 | [Assumption] |
+| Maintenance & support (updates, backups) | 2,000 | [Assumption] |
+| Data transfer & storage | 0 | [Assumption] within the Lightsail allowance |
+| **Total recurring** | **5,892** | LKR 1.31 per prescription; LKR 70,703 per year |
+
+**Free-tier / simulated vs realistic use.** The whole proof of concept (78 logged scans) cost about USD 0.09 in Bedrock
+charges [Measured] and ran on the student's laptop; no free tier was assumed. The stock list and interaction rules are
+**simulated**: realistic use needs the pharmacy's stock export (costed above) and a professionally reviewed interaction
+source (not costed).
+
+**Lower-cost alternatives:** Amazon Nova Lite (v1) would bring the recurring cost to about LKR 4,600 [Price – verify;
+accuracy not tested]; manual work only costs LKR 0 but saves no time.
+
+**Affordability.** If the tool saves 1 minute per handwritten prescription [Assumption – not yet measured], that is
+75 staff-hours a month, worth about LKR 22,500 at LKR 300/hour [Assumption] – a net value of about LKR 16,600 a month
+and a payback of the setup in about 1.5 months [derived]. The tool covers its running cost if it saves only about
+**16 seconds per prescription** [derived]. Whether it does depends on how many fields must be corrected – on clear
+prescriptions none were (TC1), on dense cursive ones 20–23 were (TC2, evaluation) – so the time saving must be
+measured in a pilot before buying.
 
 ## Adoption approach
 
-- **Who pays:** the **pharmacy owner** pays the setup and the monthly AWS bill, about LKR 3,000–5,000 a month at
-  the assumed volume. That is small compared with the staff time involved.
+- **Who pays:** the **pharmacy owner** pays the setup and the monthly running cost, about LKR 5,900 a month at
+  the assumed volume (AWS about LKR 3,600 of it). That is small compared with the staff time involved.
 - **How:** a **two-week pilot** at the dispensing counter:
   - Staff photograph handwritten prescriptions, review them in the app, and continue to dispense as normal.
   - The app's dashboard records read time, success rate, low-confidence flags and pharmacist corrections.
   - Staff also time a sample of prescriptions with and without the tool.
 - **Main condition to proceed:** **measured reading accuracy and time saving in the pilot.** For example: at least
   90% of drug names read correctly, every wrong field flagged or caught at review, and a measurable time saving per
-  prescription (above the ~8–13 s break-even) [targets are assumptions to agree with the pharmacist].
+  prescription (above the ~16 s break-even) [targets are assumptions to agree with the pharmacist].
 - **Before going live:**
   - PDPA review of cross-border processing.
   - Login and HTTPS.
