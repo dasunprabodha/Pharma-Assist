@@ -1,0 +1,60 @@
+<div class="shell" [class.nav-open]="navOpen()">
+  <aside class="sidebar" aria-label="Main navigation">
+    <div class="brand">
+      <span class="logo"><app-icon name="pill" [size]="20" /></span>
+      <div>
+        <div class="brand-name">Prescription Reader</div>
+        <div class="brand-sub">Dulnitha Pharmacy</div>
+      </div>
+    </div>
+    <nav #navEl>
+      <span class="nav-indicator" aria-hidden="true" [class.ready]="indicator().ready"
+            [style.transform]="'translateY(' + indicator().top + 'px)'" [style.height.px]="indicator().height"></span>
+      @for (link of nav; track link.path; let i = $index) {
+        <a [routerLink]="link.path" routerLinkActive="active" class="nav-link" [style.--i]="i" [appTooltip]="link.hint" tooltipPlacement="right">
+          <app-icon [name]="link.icon" />
+          <span>{{ link.label }}</span>
+        </a>
+      }
+    </nav>
+    <div class="sidebar-foot">
+      <div class="who">Pharmacist A</div>
+      <div class="muted small" appTooltip="The AI model that reads the prescription photo. Change it with BEDROCK_MODEL_ID in .env.">Amazon Nova on Amazon Bedrock</div>
+    </div>
+  </aside>
+  <div class="scrim" (click)="navOpen.set(false)"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button type="button" class="icon-btn menu-btn" (click)="navOpen.set(!navOpen())" aria-label="Open navigation">
+        <app-icon name="menu" />
+      </button>
+      <div class="disclaimer">
+        <app-icon name="shield" [size]="16" />
+        <span>Decision support only – the pharmacist must confirm every item.</span>
+      </div>
+      <a routerLink="/settings" class="status-pill" [appTooltip]="statusHint()" tooltipPlacement="bottom"
+         [class.ok]="store.status()?.credentials_found"
+         [class.bad]="store.backendDown() || (store.status() && !store.status()!.credentials_found)">
+        <span class="dot"></span>
+        @if (store.backendDown()) {
+          Backend offline
+        } @else if (store.status()) {
+          {{ store.status()!.credentials_found ? 'AI ready' : 'AI not configured' }}
+        } @else {
+          Checking…
+        }
+      </a>
+      <button type="button" class="icon-btn theme-btn" (click)="theme.toggle()"
+              [attr.aria-label]="theme.theme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
+              [attr.aria-pressed]="theme.theme() === 'dark'"
+              [appTooltip]="theme.theme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'" tooltipPlacement="bottom">
+        <app-icon [name]="theme.theme() === 'dark' ? 'sun' : 'moon'" />
+      </button>
+    </header>
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+<app-confirm-dialog />

@@ -1,0 +1,116 @@
+<section class="check" aria-labelledby="check-title">
+  <div class="head">
+    <div>
+      <h2 id="check-title"><app-icon name="shield" [size]="18" /> Dispensing check</h2>
+      <p class="muted small">Stock, in-stock generic alternatives and interactions · simulated stock list and rules – not a clinical database</p>
+    </div>
+    <div class="row">
+      <button type="button" class="btn" (click)="run()" [disabled]="loading()"><app-icon name="refresh" [size]="16" /> Re-run</button>
+      <button type="button" class="btn" (click)="downloadCsv()" [disabled]="!checklist()"><app-icon name="download" [size]="16" /> Download checklist (CSV)</button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p class="muted"><span class="spinner"></span> Checking against the stock list and rules…</p>
+  }
+  @if (!loading() && error(); as err) {
+    <div class="alert bad" role="alert">
+      <app-icon name="error" />
+      <div>
+        <div class="title">Stock/rule data unavailable</div>
+        <p>{{ err.detail || err.message }}</p>
+        <p class="small">The confirmed list above is not affected. Check the items manually.</p>
+      </div>
+    </div>
+  }
+  @if (!loading() && !error() && checklist(); as c) {
+    <div class="summary">
+      @if (counts().major) { <span class="badge bad"><app-icon name="error" [size]="12" /> {{ counts().major }} major</span> }
+      @if (counts().moderate) { <span class="badge warn"><app-icon name="alert" [size]="12" /> {{ counts().moderate }} moderate</span> }
+      @if (counts().minor) { <span class="badge info"><app-icon name="info" [size]="12" /> {{ counts().minor }} minor</span> }
+      <span class="muted small grow">{{ checked().size }} of {{ c.rows.length }} item{{ c.rows.length === 1 ? '' : 's' }} checked</span>
+    </div>
+
+    @for (w of c.warnings; track $index) {
+      <div class="alert" [class]="'alert ' + severityClass(w)" role="alert">
+        <app-icon [name]="severityIcon(w)" />
+        <div>
+          <div class="title">{{ severityLabel(w) }}{{ w.rule_id ? ' · ' + w.rule_id : '' }}</div>
+          <p>{{ w.message }}</p>
+          <p class="small">Row{{ w.rows.length > 1 ? 's' : '' }} {{ w.rows.join(' & ') }}: {{ w.items.join(' + ') }}</p>
+        </div>
+      </div>
+    } @empty {
+      <div class="alert good">
+        <app-icon name="checkCircle" />
+        <p>No interactions or duplicates found in the rule list. The rules are simulated textbook examples – use professional judgement.</p>
+      </div>
+    }
+
+    <div class="table-wrap">
+      <table class="data checklist">
+        <thead>
+          <tr><th>Checked</th><th>#</th><th>Prescribed</th><th>Pack to dispense</th><th>Stock</th><th>In-stock alternative</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          @for (r of c.rows; track r.index) {
+            <tr [class.done]="checked().has(r.index)" [class.problem]="r.status !== 'in_stock' || warningsForRow(r).length">
+              <td class="tick">
+                <input type="checkbox" [checked]="checked().has(r.index)" (change)="toggle(r)" [attr.aria-label]="'Checked row ' + r.index" />
+              </td>
+              <td class="muted">{{ r.index }}</td>
+              <td>
+                <strong>{{ r.prescribed }}</strong>
+                <div class="muted small">{{ directions(r) }}</div>
+              </td>
+              <td>
+                @if (r.item_id && r.image_url) {
+                  <div class="pack">
+                    <app-drug-thumb [src]="r.image_url" [label]="r.matched_product + ' ' + r.stock_strength" size="lg" />
+                    <div>
+                      <strong>{{ r.matched_product }}</strong> {{ r.stock_strength }}
+                      <div class="muted small">{{ r.generic_name }} · {{ r.dosage_form }}</div>
+                    </div>
+                  </div>
+                } @else {
+                  <span class="muted">–</span>
+                }
+              </td>
+              <td>
+                @switch (r.status) {
+                  @case ('in_stock') { <span class="badge good"><app-icon name="check" [size]="12" /> In stock</span><div class="muted small">{{ r.quantity_on_hand }} on hand</div> }
+                  @case ('out_of_stock') { <span class="badge bad"><app-icon name="x" [size]="12" /> Out of stock</span> }
+                  @default { <span class="badge warn"><app-icon name="alert" [size]="12" /> Not in list</span> }
+                }
+              </td>
+              <td>
+                @for (a of r.alternatives; track a.item_id) {
+                  <div class="pack alt">
+                    <app-drug-thumb [src]="a.image_url" [label]="a.brand_name + ' ' + a.strength" />
+                    <div>
+                      <strong>{{ a.brand_name }}</strong> {{ a.strength }}
+                      <div class="muted small">{{ a.quantity_on_hand }} in stock{{ a.same_strength ? '' : ' · different strength' }}</div>
+                    </div>
+                  </div>
+                } @empty {
+                  <span class="muted">–</span>
+                }
+              </td>
+              <td class="notes">
+                @for (n of r.notes; track $index) { <div>{{ n }}</div> }
+                @for (w of warningsForRow(r); track $index) { <div class="wnote" [class]="'wnote ' + severityClass(w)">{{ w.severity }}: {{ w.rule_id }}</div> }
+                @if (!r.notes.length && !warningsForRow(r).length) { <span class="muted">–</span> }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (allChecked()) {
+      <div class="alert good done-box"><app-icon name="checkCircle" /><p>All items checked by the pharmacist.</p></div>
+    }
+    <p class="muted small disclaimer">Decision support only – the pharmacist must confirm every item. Pack images are
+      illustrations unless the pharmacy has added its own photos.</p>
+  }
+</section>

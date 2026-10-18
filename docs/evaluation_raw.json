@@ -1,0 +1,3606 @@
+{
+ "v1": {
+  "model_id": "us.amazon.nova-2-lite-v1:0",
+  "prompt_version": "v1",
+  "samples": {
+   "SL02.jpg": {
+    "items_truth": 2,
+    "items_found": 2,
+    "items_pred": 2,
+    "extra": 0,
+    "fields_total": 4,
+    "fields_ok": 4,
+    "names_total": 1,
+    "names_ok": 1,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 2,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Minoxin",
+       "strength": null,
+       "dose": "1 ml",
+       "frequency": "bd",
+       "duration": "1 year",
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Mioxin",
+       "strength": "2/",
+       "dose": "1 ml",
+       "frequency": "twice daily",
+       "duration": "1 year",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "dose": true,
+       "frequency": true,
+       "duration": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Ionax",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Iomax",
+       "strength": "1 ug",
+       "dose": "3",
+       "frequency": "once daily",
+       "duration": "1 year",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.11,
+    "input_tokens": 1558,
+    "output_tokens": 118
+   },
+   "SL04.jpg": {
+    "items_truth": 1,
+    "items_found": 1,
+    "items_pred": 1,
+    "extra": 0,
+    "fields_total": 2,
+    "fields_ok": 2,
+    "names_total": 1,
+    "names_ok": 1,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 1,
+    "high_correct": 1,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Depo-Medrol",
+       "strength": "40 mg",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Depo-medrol",
+       "strength": "40 mg",
+       "dose": "1 ml",
+       "frequency": "intra-articular and soft tissue injection",
+       "duration": "40 days",
+       "confidence": "high",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "strength": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 1.698,
+    "input_tokens": 1558,
+    "output_tokens": 83
+   },
+   "SL05.jpg": {
+    "items_truth": 3,
+    "items_found": 2,
+    "items_pred": 2,
+    "extra": 0,
+    "fields_total": 5,
+    "fields_ok": 1,
+    "names_total": 2,
+    "names_ok": 1,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 1,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Dazor",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Dazor Shanper",
+       "strength": "2.0",
+       "dose": "mg",
+       "frequency": "daily",
+       "duration": "x6/52",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {}
+     },
+     {
+      "truth": {
+       "drug_name": "Terbinafine",
+       "strength": "250 mg",
+       "dose": null,
+       "frequency": "daily",
+       "duration": "6/52",
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false,
+       "duration": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Beprogel",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Beprazol",
+       "strength": "Solus",
+       "dose": "for",
+       "frequency": "YA",
+       "duration": "YA",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 1.537,
+    "input_tokens": 1558,
+    "output_tokens": 119
+   },
+   "SL06.jpg": {
+    "items_truth": 5,
+    "items_found": 4,
+    "items_pred": 5,
+    "extra": 1,
+    "fields_total": 13,
+    "fields_ok": 3,
+    "names_total": 3,
+    "names_ok": 0,
+    "wrong_items": 4,
+    "flagged_wrong": 4,
+    "correct_items": 0,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Gliclazide MR",
+       "strength": "60 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Ghiclegder",
+       "strength": "10g",
+       "dose": "1 tablet",
+       "frequency": "twice daily",
+       "duration": "5 days",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Glucophage SR",
+       "strength": "500 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Ghucophy",
+       "strength": "50g",
+       "dose": "1 tablet",
+       "frequency": "twice daily",
+       "duration": "5 days",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Sitavic",
+       "strength": "100 mg",
+       "dose": null,
+       "frequency": "mane",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Sutavica",
+       "strength": "1g",
+       "dose": "1 tablet",
+       "frequency": "once daily",
+       "duration": "5 days",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "strength": false,
+       "frequency": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Atorvastatin",
+       "strength": "10 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "?",
+       "strength": "25 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "famm",
+       "strength": "2g",
+       "dose": "1 tablet",
+       "frequency": "once daily",
+       "duration": "5 days",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.136,
+    "input_tokens": 1558,
+    "output_tokens": 252
+   },
+   "SL07.jpg": {
+    "items_truth": 5,
+    "items_found": 3,
+    "items_pred": 5,
+    "extra": 2,
+    "fields_total": 10,
+    "fields_ok": 5,
+    "names_total": 3,
+    "names_ok": 1,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 3,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Diamicron MR",
+       "strength": "60 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Glucophage SR",
+       "strength": null,
+       "dose": "2 tablets",
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": [
+        "dose"
+       ]
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Sitavic",
+       "strength": "100 mg",
+       "dose": null,
+       "frequency": "mane",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Sibavic",
+       "strength": "100",
+       "dose": "1",
+       "frequency": "mane",
+       "duration": "5 days",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "strength": true,
+       "frequency": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Bimpa",
+       "strength": "10 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Bmp",
+       "strength": "10",
+       "dose": "1",
+       "frequency": "nocte",
+       "duration": "5 days",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "strength": true,
+       "frequency": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Nitroguard",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": [
+        "strength"
+       ]
+      },
+      "pred": {
+       "drug_name": "Nuroguard",
+       "strength": "1",
+       "dose": "1",
+       "frequency": "bd",
+       "duration": "5 days",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.909,
+    "input_tokens": 1558,
+    "output_tokens": 235
+   },
+   "SL09.jpg": {
+    "items_truth": 4,
+    "items_found": 1,
+    "items_pred": 1,
+    "extra": 0,
+    "fields_total": 9,
+    "fields_ok": 0,
+    "names_total": 2,
+    "names_ok": 0,
+    "wrong_items": 1,
+    "flagged_wrong": 1,
+    "correct_items": 0,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Gliclazide MR",
+       "strength": "60 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Glucophage SR",
+       "strength": null,
+       "dose": "2 tablets",
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": [
+        "dose"
+       ]
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Sitavic",
+       "strength": "100 mg",
+       "dose": null,
+       "frequency": "mane",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Whitepile",
+       "strength": "mg",
+       "dose": "1",
+       "frequency": "bd",
+       "duration": "5 days",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Bimpa",
+       "strength": "10 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": null,
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.354,
+    "input_tokens": 1558,
+    "output_tokens": 74
+   },
+   "SL10.jpg": {
+    "items_truth": 4,
+    "items_found": 3,
+    "items_pred": 3,
+    "extra": 0,
+    "fields_total": 9,
+    "fields_ok": 2,
+    "names_total": 2,
+    "names_ok": 0,
+    "wrong_items": 2,
+    "flagged_wrong": 2,
+    "correct_items": 0,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Scanos lotion",
+       "strength": null,
+       "dose": "1 ml",
+       "frequency": "bd",
+       "duration": "3/12",
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Scinos-5 Iodam",
+       "strength": "1ml",
+       "dose": "6P",
+       "frequency": "three times daily",
+       "duration": "3/7",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "dose": false,
+       "frequency": false,
+       "duration": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Finasteride",
+       "strength": "5 mg",
+       "dose": "1/3 tablet",
+       "frequency": "nocte",
+       "duration": "3/12",
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "finaattonide (5mg)",
+       "strength": "5mg",
+       "dose": "1/3 tab",
+       "frequency": "three times daily",
+       "duration": "3/7",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": false,
+       "strength": true,
+       "dose": true,
+       "frequency": false,
+       "duration": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "? shampoo",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Sdegme Jhamye",
+       "strength": "1cdan",
+       "dose": "after lab",
+       "frequency": "as needed",
+       "duration": "2 days",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {}
+     },
+     {
+      "truth": {
+       "drug_name": "Beprogel lotion",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.875,
+    "input_tokens": 1558,
+    "output_tokens": 182
+   },
+   "SL11.jpg": {
+    "items_truth": 2,
+    "items_found": 2,
+    "items_pred": 2,
+    "extra": 0,
+    "fields_total": 5,
+    "fields_ok": 3,
+    "names_total": 2,
+    "names_ok": 1,
+    "wrong_items": 1,
+    "flagged_wrong": 1,
+    "correct_items": 1,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Finasteride",
+       "strength": "1 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": "3/12",
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Feustrid",
+       "strength": "1mg",
+       "dose": "1 tablet",
+       "frequency": "three times daily",
+       "duration": "3/12",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": false,
+       "strength": true,
+       "frequency": false,
+       "duration": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Ketoplus shampoo",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Ketoplus",
+       "strength": "shyym",
+       "dose": "1 tablet",
+       "frequency": "for 1/4",
+       "duration": "1/4",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.124,
+    "input_tokens": 1558,
+    "output_tokens": 126
+   },
+   "SL12.jpg": {
+    "items_truth": 7,
+    "items_found": 5,
+    "items_pred": 6,
+    "extra": 1,
+    "fields_total": 15,
+    "fields_ok": 9,
+    "names_total": 7,
+    "names_ok": 5,
+    "wrong_items": 1,
+    "flagged_wrong": 1,
+    "correct_items": 4,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "3 cc syringe",
+       "strength": null,
+       "dose": "02",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Syringe",
+       "strength": "3 cc",
+       "dose": "1",
+       "frequency": "as needed",
+       "duration": "40",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "23G needle",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Needle",
+       "strength": "23 g",
+       "dose": "1",
+       "frequency": "as needed",
+       "duration": "01",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Depo-Medrol",
+       "strength": "40 mg",
+       "dose": "1 vial",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "dose": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Dettol plaster",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Detol Plaster",
+       "strength": "01",
+       "dose": "1",
+       "frequency": "as needed",
+       "duration": "01",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Disposable gloves",
+       "strength": null,
+       "dose": "01 pair",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Disposable gloves",
+       "strength": "01 pair",
+       "dose": "1",
+       "frequency": "as needed",
+       "duration": "01",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Surgical spirit",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Surgical spirit",
+       "strength": "01",
+       "dose": "1",
+       "frequency": "as needed",
+       "duration": "01",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Cotton wool",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "dose": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.26,
+    "input_tokens": 1558,
+    "output_tokens": 274
+   }
+  }
+ },
+ "v2": {
+  "model_id": "us.amazon.nova-2-lite-v1:0",
+  "prompt_version": "v2",
+  "samples": {
+   "SL02.jpg": {
+    "items_truth": 2,
+    "items_found": 2,
+    "items_pred": 2,
+    "extra": 0,
+    "fields_total": 4,
+    "fields_ok": 4,
+    "names_total": 1,
+    "names_ok": 1,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 2,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Minoxin",
+       "strength": null,
+       "dose": "1 ml",
+       "frequency": "bd",
+       "duration": "1 year",
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Miwoxin",
+       "strength": null,
+       "dose": "1 ml",
+       "frequency": "bd",
+       "duration": "1 year",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "dose": true,
+       "frequency": true,
+       "duration": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Ionax",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Ionax",
+       "strength": "1 ug",
+       "dose": "3",
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.039,
+    "input_tokens": 1888,
+    "output_tokens": 114
+   },
+   "SL04.jpg": {
+    "items_truth": 1,
+    "items_found": 1,
+    "items_pred": 1,
+    "extra": 0,
+    "fields_total": 2,
+    "fields_ok": 2,
+    "names_total": 1,
+    "names_ok": 1,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 1,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Depo-Medrol",
+       "strength": "40 mg",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Depo-medrol",
+       "strength": "40 mg",
+       "dose": "1 ml",
+       "frequency": "intra-articular and soft tissue injection",
+       "duration": "40 y",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "strength": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 1.522,
+    "input_tokens": 1888,
+    "output_tokens": 83
+   },
+   "SL05.jpg": {
+    "items_truth": 3,
+    "items_found": 2,
+    "items_pred": 3,
+    "extra": 1,
+    "fields_total": 5,
+    "fields_ok": 1,
+    "names_total": 2,
+    "names_ok": 1,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 1,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Dazor",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Dazor Shampoo",
+       "strength": "YA",
+       "dose": "for",
+       "frequency": "YA",
+       "duration": "YA",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {}
+     },
+     {
+      "truth": {
+       "drug_name": "Terbinafine",
+       "strength": "250 mg",
+       "dose": null,
+       "frequency": "daily",
+       "duration": "6/52",
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false,
+       "duration": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Beprogel",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Beprazol",
+       "strength": "Lotris",
+       "dose": "for",
+       "frequency": "YA",
+       "duration": "YA",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 1.506,
+    "input_tokens": 1888,
+    "output_tokens": 159
+   },
+   "SL06.jpg": {
+    "items_truth": 5,
+    "items_found": 3,
+    "items_pred": 5,
+    "extra": 2,
+    "fields_total": 13,
+    "fields_ok": 2,
+    "names_total": 3,
+    "names_ok": 0,
+    "wrong_items": 3,
+    "flagged_wrong": 3,
+    "correct_items": 0,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Gliclazide MR",
+       "strength": "60 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Ghiclegder",
+       "strength": "60g",
+       "dose": "1",
+       "frequency": "twice daily (bd)",
+       "duration": "5 days",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": false,
+       "strength": true,
+       "frequency": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Glucophage SR",
+       "strength": "500 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Sitavic",
+       "strength": "100 mg",
+       "dose": null,
+       "frequency": "mane",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Sutavica",
+       "strength": "1g",
+       "dose": "1",
+       "frequency": "three times daily (tds)",
+       "duration": "5 days",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Atorvastatin",
+       "strength": "10 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "?",
+       "strength": "25 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "famm",
+       "strength": "2g",
+       "dose": "1",
+       "frequency": "three times daily (tds)",
+       "duration": "5 days",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 3.007,
+    "input_tokens": 1888,
+    "output_tokens": 261
+   },
+   "SL07.jpg": {
+    "items_truth": 5,
+    "items_found": 3,
+    "items_pred": 5,
+    "extra": 2,
+    "fields_total": 10,
+    "fields_ok": 5,
+    "names_total": 3,
+    "names_ok": 1,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 3,
+    "high_correct": 3,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Diamicron MR",
+       "strength": "60 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Glucophage SR",
+       "strength": null,
+       "dose": "2 tablets",
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": [
+        "dose"
+       ]
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Sitavic",
+       "strength": "100 mg",
+       "dose": null,
+       "frequency": "mane",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Sibavic",
+       "strength": "100 mg",
+       "dose": "1 tablet",
+       "frequency": "once daily (od)",
+       "duration": "30 days",
+       "confidence": "high",
+       "note": null
+      },
+      "results": {
+       "strength": true,
+       "frequency": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Bimpa",
+       "strength": "10 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Bmp",
+       "strength": "10 mg",
+       "dose": "1 tablet",
+       "frequency": "once daily (od)",
+       "duration": "30 days",
+       "confidence": "high",
+       "note": null
+      },
+      "results": {
+       "strength": true,
+       "frequency": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Nitroguard",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": [
+        "strength"
+       ]
+      },
+      "pred": {
+       "drug_name": "Nuroguard",
+       "strength": "1 mg",
+       "dose": "1 tablet",
+       "frequency": "once daily (od)",
+       "duration": "30 days",
+       "confidence": "high",
+       "note": null
+      },
+      "results": {
+       "drug_name": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.624,
+    "input_tokens": 1888,
+    "output_tokens": 262
+   },
+   "SL09.jpg": {
+    "items_truth": 4,
+    "items_found": 2,
+    "items_pred": 4,
+    "extra": 2,
+    "fields_total": 9,
+    "fields_ok": 0,
+    "names_total": 2,
+    "names_ok": 0,
+    "wrong_items": 2,
+    "flagged_wrong": 2,
+    "correct_items": 0,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Gliclazide MR",
+       "strength": "60 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Glucophage SR",
+       "strength": null,
+       "dose": "2 tablets",
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": [
+        "dose"
+       ]
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Sitavic",
+       "strength": "100 mg",
+       "dose": null,
+       "frequency": "mane",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Sulav",
+       "strength": "mg",
+       "dose": "1",
+       "frequency": "bd",
+       "duration": "5 days",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Bimpa",
+       "strength": "10 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Rmp",
+       "strength": "mg",
+       "dose": "1",
+       "frequency": "bd",
+       "duration": "5 days",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.477,
+    "input_tokens": 1888,
+    "output_tokens": 191
+   },
+   "SL10.jpg": {
+    "items_truth": 4,
+    "items_found": 3,
+    "items_pred": 3,
+    "extra": 0,
+    "fields_total": 9,
+    "fields_ok": 2,
+    "names_total": 2,
+    "names_ok": 0,
+    "wrong_items": 2,
+    "flagged_wrong": 2,
+    "correct_items": 0,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Scanos lotion",
+       "strength": null,
+       "dose": "1 ml",
+       "frequency": "bd",
+       "duration": "3/12",
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Scinos-5",
+       "strength": "1ml",
+       "dose": "6",
+       "frequency": "x3/1/2",
+       "duration": "1/2",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "dose": false,
+       "frequency": false,
+       "duration": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Finasteride",
+       "strength": "5 mg",
+       "dose": "1/3 tablet",
+       "frequency": "nocte",
+       "duration": "3/12",
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "finaxtomide",
+       "strength": "5mg",
+       "dose": "1/3",
+       "frequency": "table x 3/1/c",
+       "duration": "1/2",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": false,
+       "strength": true,
+       "dose": true,
+       "frequency": false,
+       "duration": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "? shampoo",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Sdegme",
+       "strength": "1ml",
+       "dose": "after",
+       "frequency": "Lah",
+       "duration": "2 Scay",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {}
+     },
+     {
+      "truth": {
+       "drug_name": "Beprogel lotion",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 3.263,
+    "input_tokens": 1888,
+    "output_tokens": 177
+   },
+   "SL11.jpg": {
+    "items_truth": 2,
+    "items_found": 2,
+    "items_pred": 2,
+    "extra": 0,
+    "fields_total": 5,
+    "fields_ok": 3,
+    "names_total": 2,
+    "names_ok": 1,
+    "wrong_items": 1,
+    "flagged_wrong": 1,
+    "correct_items": 1,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Finasteride",
+       "strength": "1 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": "3/12",
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Feuerteride",
+       "strength": "1 mg",
+       "dose": "1/2 tablet",
+       "frequency": "three times daily (tds)",
+       "duration": "3/12",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": false,
+       "strength": true,
+       "frequency": false,
+       "duration": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Ketoplus shampoo",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Ketoplus",
+       "strength": "shyym",
+       "dose": "1/4",
+       "frequency": "once daily (od)",
+       "duration": "1/12",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.091,
+    "input_tokens": 1888,
+    "output_tokens": 132
+   },
+   "SL12.jpg": {
+    "items_truth": 7,
+    "items_found": 7,
+    "items_pred": 7,
+    "extra": 0,
+    "fields_total": 15,
+    "fields_ok": 11,
+    "names_total": 7,
+    "names_ok": 7,
+    "wrong_items": 4,
+    "flagged_wrong": 4,
+    "correct_items": 3,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "3 cc syringe",
+       "strength": null,
+       "dose": "02",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Syringe",
+       "strength": "3 cc",
+       "dose": "02",
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "23G needle",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Needle",
+       "strength": "23 g",
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Depo-Medrol",
+       "strength": "40 mg",
+       "dose": "1 vial",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Depo",
+       "strength": "40",
+       "dose": "1 ml",
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "strength": true,
+       "dose": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Dettol plaster",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Detol Plaster",
+       "strength": "01",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Disposable gloves",
+       "strength": null,
+       "dose": "01 pair",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Disposable gloves",
+       "strength": "01 pair",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Surgical spirit",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Surgical spirit",
+       "strength": "01",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Cotton wool",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Cotton wool",
+       "strength": "01",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.697,
+    "input_tokens": 1888,
+    "output_tokens": 308
+   }
+  }
+ },
+ "v3": {
+  "model_id": "us.amazon.nova-2-lite-v1:0",
+  "prompt_version": "v3",
+  "samples": {
+   "SL02.jpg": {
+    "items_truth": 2,
+    "items_found": 2,
+    "items_pred": 2,
+    "extra": 0,
+    "fields_total": 4,
+    "fields_ok": 4,
+    "names_total": 1,
+    "names_ok": 1,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 2,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Minoxin",
+       "strength": null,
+       "dose": "1 ml",
+       "frequency": "bd",
+       "duration": "1 year",
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Miwoxin",
+       "strength": null,
+       "dose": "1 ml",
+       "frequency": "twice daily (bd)",
+       "duration": "1 year",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "dose": true,
+       "frequency": true,
+       "duration": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Ionax",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Ionax",
+       "strength": "1 ug",
+       "dose": "3",
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.755,
+    "input_tokens": 2046,
+    "output_tokens": 118
+   },
+   "SL04.jpg": {
+    "items_truth": 1,
+    "items_found": 1,
+    "items_pred": 1,
+    "extra": 0,
+    "fields_total": 2,
+    "fields_ok": 2,
+    "names_total": 1,
+    "names_ok": 1,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 1,
+    "high_correct": 1,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Depo-Medrol",
+       "strength": "40 mg",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Depo-medrol",
+       "strength": "40 mg",
+       "dose": "1 ml",
+       "frequency": "intra-articular and soft tissue injection",
+       "duration": "40 y",
+       "confidence": "high",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "strength": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 1.711,
+    "input_tokens": 2046,
+    "output_tokens": 83
+   },
+   "SL05.jpg": {
+    "items_truth": 3,
+    "items_found": 2,
+    "items_pred": 3,
+    "extra": 1,
+    "fields_total": 5,
+    "fields_ok": 1,
+    "names_total": 2,
+    "names_ok": 1,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 1,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Dazor",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Dazor Shampoo",
+       "strength": "YA",
+       "dose": "for",
+       "frequency": "YA",
+       "duration": "YA",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {}
+     },
+     {
+      "truth": {
+       "drug_name": "Terbinafine",
+       "strength": "250 mg",
+       "dose": null,
+       "frequency": "daily",
+       "duration": "6/52",
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false,
+       "duration": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Beprogel",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Benragel",
+       "strength": "Lotris",
+       "dose": "for",
+       "frequency": "YA",
+       "duration": "YA",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.239,
+    "input_tokens": 2046,
+    "output_tokens": 160
+   },
+   "SL06.jpg": {
+    "items_truth": 5,
+    "items_found": 3,
+    "items_pred": 5,
+    "extra": 2,
+    "fields_total": 13,
+    "fields_ok": 2,
+    "names_total": 3,
+    "names_ok": 0,
+    "wrong_items": 3,
+    "flagged_wrong": 0,
+    "correct_items": 0,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Gliclazide MR",
+       "strength": "60 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Ghiclegder",
+       "strength": "60g",
+       "dose": "1",
+       "frequency": "twice daily (bd)",
+       "duration": "5 days",
+       "confidence": "high",
+       "note": null
+      },
+      "results": {
+       "drug_name": false,
+       "strength": true,
+       "frequency": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Glucophage SR",
+       "strength": "500 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Sitavic",
+       "strength": "100 mg",
+       "dose": null,
+       "frequency": "mane",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Sitavic",
+       "strength": "1mg",
+       "dose": "1",
+       "frequency": "three times daily (tds)",
+       "duration": "5 days",
+       "confidence": "high",
+       "note": null
+      },
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Atorvastatin",
+       "strength": "10 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "?",
+       "strength": "25 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "famm",
+       "strength": "2g",
+       "dose": "1",
+       "frequency": "three times daily (tds)",
+       "duration": "5 days",
+       "confidence": "high",
+       "note": null
+      },
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 3.296,
+    "input_tokens": 2046,
+    "output_tokens": 259
+   },
+   "SL07.jpg": {
+    "items_truth": 5,
+    "items_found": 3,
+    "items_pred": 5,
+    "extra": 2,
+    "fields_total": 10,
+    "fields_ok": 5,
+    "names_total": 3,
+    "names_ok": 1,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 3,
+    "high_correct": 3,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Diamicron MR",
+       "strength": "60 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Glucophage SR",
+       "strength": null,
+       "dose": "2 tablets",
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": [
+        "dose"
+       ]
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Sitavic",
+       "strength": "100 mg",
+       "dose": null,
+       "frequency": "mane",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Sitavic",
+       "strength": "100 mg",
+       "dose": "1 tablet",
+       "frequency": "once daily (od)",
+       "duration": "30 days",
+       "confidence": "high",
+       "note": null
+      },
+      "results": {
+       "strength": true,
+       "frequency": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Bimpa",
+       "strength": "10 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Bmp",
+       "strength": "10 mg",
+       "dose": "1 tablet",
+       "frequency": "once daily (od)",
+       "duration": "7 days",
+       "confidence": "high",
+       "note": null
+      },
+      "results": {
+       "strength": true,
+       "frequency": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Nitroguard",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": [
+        "strength"
+       ]
+      },
+      "pred": {
+       "drug_name": "Neuroguard",
+       "strength": "1 mg",
+       "dose": "1 tablet",
+       "frequency": "once daily (od)",
+       "duration": "30 days",
+       "confidence": "high",
+       "note": null
+      },
+      "results": {
+       "drug_name": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.642,
+    "input_tokens": 2046,
+    "output_tokens": 259
+   },
+   "SL09.jpg": {
+    "items_truth": 4,
+    "items_found": 1,
+    "items_pred": 1,
+    "extra": 0,
+    "fields_total": 9,
+    "fields_ok": 0,
+    "names_total": 2,
+    "names_ok": 0,
+    "wrong_items": 1,
+    "flagged_wrong": 1,
+    "correct_items": 0,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Gliclazide MR",
+       "strength": "60 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Glucophage SR",
+       "strength": null,
+       "dose": "2 tablets",
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": [
+        "dose"
+       ]
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Sitavic",
+       "strength": "100 mg",
+       "dose": null,
+       "frequency": "mane",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Whitpile",
+       "strength": "mg",
+       "dose": "1",
+       "frequency": "bd",
+       "duration": "5 days",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Bimpa",
+       "strength": "10 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": null,
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 3.514,
+    "input_tokens": 2046,
+    "output_tokens": 73
+   },
+   "SL10.jpg": {
+    "items_truth": 4,
+    "items_found": 3,
+    "items_pred": 3,
+    "extra": 0,
+    "fields_total": 9,
+    "fields_ok": 3,
+    "names_total": 2,
+    "names_ok": 0,
+    "wrong_items": 2,
+    "flagged_wrong": 2,
+    "correct_items": 0,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Scanos lotion",
+       "strength": null,
+       "dose": "1 ml",
+       "frequency": "bd",
+       "duration": "3/12",
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Scinos-5",
+       "strength": "1ml",
+       "dose": "6 p",
+       "frequency": "x3/1/2",
+       "duration": "1/2",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "dose": false,
+       "frequency": false,
+       "duration": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Finasteride",
+       "strength": "5 mg",
+       "dose": "1/3 tablet",
+       "frequency": "nocte",
+       "duration": "3/12",
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "finaattonide",
+       "strength": "5mg",
+       "dose": "1/3 tablet",
+       "frequency": "once x 3/1/2",
+       "duration": "3/1/2",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": false,
+       "strength": true,
+       "dose": true,
+       "frequency": true,
+       "duration": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "? shampoo",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Sdegme",
+       "strength": "1ml",
+       "dose": "after bath",
+       "frequency": "2 scag",
+       "duration": "1/2",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {}
+     },
+     {
+      "truth": {
+       "drug_name": "Beprogel lotion",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.26,
+    "input_tokens": 2046,
+    "output_tokens": 184
+   },
+   "SL11.jpg": {
+    "items_truth": 2,
+    "items_found": 2,
+    "items_pred": 2,
+    "extra": 0,
+    "fields_total": 5,
+    "fields_ok": 3,
+    "names_total": 2,
+    "names_ok": 1,
+    "wrong_items": 1,
+    "flagged_wrong": 1,
+    "correct_items": 1,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Finasteride",
+       "strength": "1 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": "3/12",
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Feuerteride",
+       "strength": "1 mg",
+       "dose": "1/2 tablet",
+       "frequency": "three times daily (tds)",
+       "duration": "3/12",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": false,
+       "strength": true,
+       "frequency": false,
+       "duration": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Ketoplus shampoo",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Ketoplus",
+       "strength": "shyym",
+       "dose": "1/4",
+       "frequency": "once daily (od)",
+       "duration": "1/A",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.0,
+    "input_tokens": 2046,
+    "output_tokens": 131
+   },
+   "SL12.jpg": {
+    "items_truth": 7,
+    "items_found": 7,
+    "items_pred": 7,
+    "extra": 0,
+    "fields_total": 15,
+    "fields_ok": 11,
+    "names_total": 7,
+    "names_ok": 7,
+    "wrong_items": 4,
+    "flagged_wrong": 4,
+    "correct_items": 3,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "3 cc syringe",
+       "strength": null,
+       "dose": "02",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Syringe",
+       "strength": "3 cc",
+       "dose": "02",
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "23G needle",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Needle",
+       "strength": "23 g",
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Depo-Medrol",
+       "strength": "40 mg",
+       "dose": "1 vial",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Depo",
+       "strength": "40",
+       "dose": "1 ml",
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "strength": true,
+       "dose": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Dettol plaster",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Detol Plaster",
+       "strength": "01",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Disposable gloves",
+       "strength": null,
+       "dose": "01 pair",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Disposable gloves",
+       "strength": "01 pair",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Surgical spirit",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Surgical spirit",
+       "strength": "01",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Cotton wool",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Cotton wool",
+       "strength": "01",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.393,
+    "input_tokens": 2046,
+    "output_tokens": 308
+   }
+  }
+ },
+ "pro-v2": {
+  "model_id": "us.amazon.nova-pro-v1:0",
+  "prompt_version": "v2",
+  "samples": {
+   "SL02.jpg": {
+    "items_truth": 2,
+    "items_found": 2,
+    "items_pred": 2,
+    "extra": 0,
+    "fields_total": 4,
+    "fields_ok": 4,
+    "names_total": 1,
+    "names_ok": 1,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 2,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Minoxin",
+       "strength": null,
+       "dose": "1 ml",
+       "frequency": "bd",
+       "duration": "1 year",
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Minoxin",
+       "strength": null,
+       "dose": "1 ml",
+       "frequency": "twice daily (bd)",
+       "duration": "1 year",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "dose": true,
+       "frequency": true,
+       "duration": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Ionax",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Ionax",
+       "strength": "1 mg",
+       "dose": "1 tablet",
+       "frequency": "twice daily (bd)",
+       "duration": "3 days",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 3.378,
+    "input_tokens": 2362,
+    "output_tokens": 110
+   },
+   "SL04.jpg": {
+    "items_truth": 1,
+    "items_found": 1,
+    "items_pred": 2,
+    "extra": 1,
+    "fields_total": 2,
+    "fields_ok": 2,
+    "names_total": 1,
+    "names_ok": 1,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 1,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Depo-Medrol",
+       "strength": "40 mg",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Depo-Medrol",
+       "strength": "40 mg",
+       "dose": "1 ml",
+       "frequency": "once daily (od)",
+       "duration": "5 days (5/7)",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "strength": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.315,
+    "input_tokens": 1946,
+    "output_tokens": 125
+   },
+   "SL05.jpg": {
+    "items_truth": 3,
+    "items_found": 3,
+    "items_pred": 3,
+    "extra": 0,
+    "fields_total": 5,
+    "fields_ok": 1,
+    "names_total": 2,
+    "names_ok": 1,
+    "wrong_items": 2,
+    "flagged_wrong": 2,
+    "correct_items": 0,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Dazor",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Dazol Shampoo",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {}
+     },
+     {
+      "truth": {
+       "drug_name": "Terbinafine",
+       "strength": "250 mg",
+       "dose": null,
+       "frequency": "daily",
+       "duration": "6/52",
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Terbinafin",
+       "strength": "200 mg",
+       "dose": "1 tablet",
+       "frequency": "twice daily (bd)",
+       "duration": "10 days",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "strength": false,
+       "frequency": false,
+       "duration": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Beprogel",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Benagel",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.993,
+    "input_tokens": 2953,
+    "output_tokens": 150
+   },
+   "SL06.jpg": {
+    "items_truth": 5,
+    "items_found": 2,
+    "items_pred": 5,
+    "extra": 3,
+    "fields_total": 13,
+    "fields_ok": 1,
+    "names_total": 3,
+    "names_ok": 0,
+    "wrong_items": 2,
+    "flagged_wrong": 2,
+    "correct_items": 0,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Gliclazide MR",
+       "strength": "60 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Glucophage SR",
+       "strength": "500 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Sitavic",
+       "strength": "100 mg",
+       "dose": null,
+       "frequency": "mane",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Sative",
+       "strength": "50g",
+       "dose": "mence",
+       "frequency": "twice daily (bd)",
+       "duration": "5 days",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Atorvastatin",
+       "strength": "10 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "?",
+       "strength": "25 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "famm",
+       "strength": "2g",
+       "dose": "BP",
+       "frequency": "twice daily (bd)",
+       "duration": "5 days",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "strength": false,
+       "frequency": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 3.442,
+    "input_tokens": 2938,
+    "output_tokens": 252
+   },
+   "SL07.jpg": {
+    "items_truth": 5,
+    "items_found": 3,
+    "items_pred": 5,
+    "extra": 2,
+    "fields_total": 10,
+    "fields_ok": 1,
+    "names_total": 3,
+    "names_ok": 1,
+    "wrong_items": 2,
+    "flagged_wrong": 2,
+    "correct_items": 1,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Diamicron MR",
+       "strength": "60 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Glucophage SR",
+       "strength": null,
+       "dose": "2 tablets",
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": [
+        "dose"
+       ]
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Sitavic",
+       "strength": "100 mg",
+       "dose": null,
+       "frequency": "mane",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Subvic",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Bimpa",
+       "strength": "10 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Bmp",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Nitroguard",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": [
+        "strength"
+       ]
+      },
+      "pred": {
+       "drug_name": "Niroguard",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 3.276,
+    "input_tokens": 1896,
+    "output_tokens": 238
+   },
+   "SL09.jpg": {
+    "items_truth": 4,
+    "items_found": 0,
+    "items_pred": 0,
+    "extra": 0,
+    "fields_total": 9,
+    "fields_ok": 0,
+    "names_total": 2,
+    "names_ok": 0,
+    "wrong_items": 0,
+    "flagged_wrong": 0,
+    "correct_items": 0,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Gliclazide MR",
+       "strength": "60 mg",
+       "dose": null,
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Glucophage SR",
+       "strength": null,
+       "dose": "2 tablets",
+       "frequency": "bd",
+       "duration": null,
+       "uncertain": [
+        "dose"
+       ]
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Sitavic",
+       "strength": "100 mg",
+       "dose": null,
+       "frequency": "mane",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": null,
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Bimpa",
+       "strength": "10 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": null,
+      "results": {
+       "strength": false,
+       "frequency": false
+      }
+     }
+    ],
+    "error": "config_error: ModelErrorException: Model produced invalid sequence as part of ToolUse. Please refer to the model tool use troubleshooting guide.",
+    "latency_s": 8.718405485153198,
+    "input_tokens": 0,
+    "output_tokens": 0
+   },
+   "SL10.jpg": {
+    "items_truth": 4,
+    "items_found": 3,
+    "items_pred": 4,
+    "extra": 1,
+    "fields_total": 9,
+    "fields_ok": 3,
+    "names_total": 2,
+    "names_ok": 0,
+    "wrong_items": 1,
+    "flagged_wrong": 1,
+    "correct_items": 1,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Scanos lotion",
+       "strength": null,
+       "dose": "1 ml",
+       "frequency": "bd",
+       "duration": "3/12",
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Scino-5",
+       "strength": "100ml",
+       "dose": "1ml",
+       "frequency": "bd",
+       "duration": "3/12",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "dose": true,
+       "frequency": true,
+       "duration": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Finasteride",
+       "strength": "5 mg",
+       "dose": "1/3 tablet",
+       "frequency": "nocte",
+       "duration": "3/12",
+       "uncertain": []
+      },
+      "pred": null,
+      "results": {
+       "drug_name": false,
+       "strength": false,
+       "dose": false,
+       "frequency": false,
+       "duration": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "? shampoo",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": [
+        "drug_name"
+       ]
+      },
+      "pred": {
+       "drug_name": "Stagmore",
+       "strength": "Shampoo",
+       "dose": "100ml",
+       "frequency": "bd",
+       "duration": "3/12",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {}
+     },
+     {
+      "truth": {
+       "drug_name": "Beprogel lotion",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Bemoge",
+       "strength": "100ml",
+       "dose": "100ml",
+       "frequency": "bd",
+       "duration": "3/12",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.951,
+    "input_tokens": 2810,
+    "output_tokens": 212
+   },
+   "SL11.jpg": {
+    "items_truth": 2,
+    "items_found": 2,
+    "items_pred": 2,
+    "extra": 0,
+    "fields_total": 5,
+    "fields_ok": 3,
+    "names_total": 2,
+    "names_ok": 1,
+    "wrong_items": 2,
+    "flagged_wrong": 2,
+    "correct_items": 0,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "Finasteride",
+       "strength": "1 mg",
+       "dose": null,
+       "frequency": "nocte",
+       "duration": "3/12",
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Fenastrid",
+       "strength": "1mg",
+       "dose": "1",
+       "frequency": "twice daily (bd)",
+       "duration": "3/12",
+       "confidence": "medium",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "strength": true,
+       "frequency": false,
+       "duration": true
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Ketoplus shampoo",
+       "strength": null,
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Keto plus",
+       "strength": "Shym",
+       "dose": "to",
+       "frequency": "once daily (od)",
+       "duration": "1/A",
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 2.657,
+    "input_tokens": 2970,
+    "output_tokens": 114
+   },
+   "SL12.jpg": {
+    "items_truth": 7,
+    "items_found": 7,
+    "items_pred": 7,
+    "extra": 0,
+    "fields_total": 15,
+    "fields_ok": 7,
+    "names_total": 7,
+    "names_ok": 7,
+    "wrong_items": 7,
+    "flagged_wrong": 7,
+    "correct_items": 0,
+    "high_correct": 0,
+    "rows": [
+     {
+      "truth": {
+       "drug_name": "3 cc syringe",
+       "strength": null,
+       "dose": "02",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "3 cc syringes",
+       "strength": "02",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "23G needle",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "23 g needle",
+       "strength": "01",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Depo-Medrol",
+       "strength": "40 mg",
+       "dose": "1 vial",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Depo-medrol 40",
+       "strength": "1ml",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "strength": false,
+       "dose": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Dettol plaster",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Detol Plaster",
+       "strength": "01",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Disposable gloves",
+       "strength": null,
+       "dose": "01 pair",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Disposable gloves",
+       "strength": "01 pair",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Surgical spirit",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Surgical spirit",
+       "strength": "01",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     },
+     {
+      "truth": {
+       "drug_name": "Cotton wool",
+       "strength": null,
+       "dose": "01",
+       "frequency": null,
+       "duration": null,
+       "uncertain": []
+      },
+      "pred": {
+       "drug_name": "Cotton wool",
+       "strength": "01",
+       "dose": null,
+       "frequency": null,
+       "duration": null,
+       "confidence": "low",
+       "note": null
+      },
+      "results": {
+       "drug_name": true,
+       "dose": false
+      }
+     }
+    ],
+    "error": null,
+    "latency_s": 4.354,
+    "input_tokens": 2457,
+    "output_tokens": 316
+   }
+  }
+ }
+}

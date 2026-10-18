@@ -1,0 +1,22 @@
+rule_id,rule_type,item_a,item_b,severity,warning_message
+R001,interaction,warfarin,aspirin,major,Increased bleeding risk. Confirm with prescriber.
+R002,interaction,warfarin,ibuprofen,major,NSAID with warfarin increases bleeding risk.
+R003,interaction,warfarin,diclofenac,major,NSAID with warfarin increases bleeding risk.
+R004,interaction,warfarin,metronidazole,major,Metronidazole can markedly raise warfarin effect (INR).
+R005,interaction,warfarin,clarithromycin,major,Clarithromycin can raise warfarin effect (INR).
+R006,interaction,warfarin,ciprofloxacin,moderate,Ciprofloxacin may raise warfarin effect (INR).
+R007,interaction,simvastatin,clarithromycin,major,Raised simvastatin levels; risk of muscle damage. Combination normally avoided.
+R008,interaction,atorvastatin,clarithromycin,moderate,Raised atorvastatin levels; monitor for muscle pain.
+R009,interaction,clopidogrel,omeprazole,moderate,Omeprazole may reduce clopidogrel's antiplatelet effect.
+R010,interaction,clopidogrel,esomeprazole,moderate,Esomeprazole may reduce clopidogrel's antiplatelet effect.
+R011,interaction,clopidogrel,aspirin,moderate,Increased bleeding risk; often intentional (dual antiplatelet). Confirm intent.
+R012,interaction,aspirin,ibuprofen,moderate,Ibuprofen may reduce aspirin's antiplatelet effect; added stomach bleeding risk.
+R013,interaction,enalapril,ibuprofen,moderate,NSAID may reduce blood-pressure control and affect kidney function.
+R014,interaction,losartan,ibuprofen,moderate,NSAID may reduce blood-pressure control and affect kidney function.
+R015,interaction,enalapril,losartan,major,Dual ACE inhibitor + ARB blockade; raised risk of high potassium and kidney problems.
+R016,interaction,ciprofloxacin,prednisolone,moderate,Fluoroquinolone with corticosteroid raises tendon rupture risk.
+R017,duplicate_class,NSAID,NSAID,moderate,Two NSAIDs prescribed together.
+R018,duplicate_class,statin,statin,moderate,Two statins prescribed together.
+R019,duplicate_class,proton pump inhibitor,proton pump inhibitor,minor,Two PPIs prescribed together.
+R020,duplicate_class,antihistamine,antihistamine,minor,Two antihistamines prescribed together; check for drowsiness.
+R021,duplicate_generic,any,any,moderate,Same active ingredient appears twice (e.g. two paracetamol products).

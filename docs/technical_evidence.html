@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Technical Evidence – Prescription Reader (MS25903874)</title>
+<!-- Print to PDF: A4, default margins, "Background graphics" on. Must stay within 4 pages:
+     pages 1-2 solution evidence, pages 3-4 AI use declaration. Yellow [confirm] cells must be completed by the student. -->
+<style>
+  @page { size: A4; margin: 11mm 11mm 12mm 11mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "DejaVu Sans", Arial, sans-serif; color: #15171c; font-size: 7.9pt; line-height: 1.36; margin: 0; }
+  h1 { font-size: 13pt; margin: 0; }
+  .meta { color: #555; font-size: 7.6pt; margin: 1pt 0 5pt; border-bottom: 1.5px solid #1c5cab; padding-bottom: 3pt; }
+  h2 { font-size: 9.2pt; color: #1c5cab; margin: 6pt 0 2pt; }
+  p { margin: 0 0 3pt; }
+  ul { margin: 0 0 3pt; padding-left: 12pt; }
+  li { margin-bottom: 1pt; }
+  table { width: 100%; border-collapse: collapse; margin: 2pt 0 4pt; font-size: 7.3pt; }
+  th { background: #eef2f8; text-align: left; padding: 2pt 3pt; border: 1px solid #d6dbe4; }
+  td { padding: 2pt 3pt; border: 1px solid #d6dbe4; vertical-align: top; }
+  .num { text-align: right; white-space: nowrap; }
+  .two { display: flex; gap: 8pt; } .two > div { flex: 1; min-width: 0; }
+  img.arch { width: 100%; display: block; margin: 2pt 0 1pt; }
+  .cap { font-size: 6.9pt; color: #555; }
+  .pass { color: #127a2c; font-weight: bold; } .partial { color: #8a5a00; font-weight: bold; }
+  .tag { font-size: 6.6pt; color: #555; }
+  .page2 { page-break-before: always; }
+  .ai { page-break-before: always; }
+  .ai table { font-size: 7.2pt; }
+  .ai td:nth-child(1) { width: 2.5%; } .ai td:nth-child(2) { width: 11%; } .ai td:nth-child(3) { width: 14%; }
+  .confirm { background: #fff3b0; }
+  b.k { color: #1c5cab; }
+</style>
+</head>
+<body>
+
+<h1>Prescription Reader – AI-assisted prescription reading and dispensing check</h1>
+<div class="meta">IT6070 Emerging Topics in IT · Assignment II · <b>U.W.D.P. Amarasinghe – MS25903874</b> · Technical evidence · 18/10/2026 ·
+Repository: <i>[add link]</i></div>
+
+<h2>1. Professional and problem</h2>
+<p><b>"Pharmacist A"</b> (declared pseudonym; real name withheld), <b>Registered Pharmacist</b>, Dulnitha Pharmacy, Kottawa – an independent
+<b>community retail pharmacy (healthcare)</b>; pharmacy named with permission. The pharmacist dispenses prescriptions at the counter, most of them
+handwritten by different doctors. <b>Evidence of need</b> (face-to-face discussion, 30/09/2026; pharmacist's estimates): ~200 prescriptions/day,
+70–80% handwritten; 2–3 min each to decipher, cross-check and match to stock (≈5–8 staff-hours/day); ~3% need a colleague or the prescriber.
+Misreading a drug or dose is a patient-safety risk.</p>
+<ul>
+  <li><b class="k">R1 – Read the prescription:</b> from a phone photo, list each item's drug, strength, dose, frequency and duration in an editable
+  list within 30 s, expanding shorthand (bd, nocte, 5/7) and flagging uncertain fields.</li>
+  <li><b class="k">R2 – Check before dispensing:</b> match the confirmed list with stock and interaction rules; produce a checklist with warnings and
+  in-stock generic alternatives. No patient name is sent or stored.</li>
+</ul>
+
+<h2>2. Emerging technology, justification and alternative</h2>
+<p>A <b>multimodal (vision) foundation model – Amazon Nova 2 Lite on Amazon Bedrock</b> – looks at the photo and returns the items as structured
+data in one step (Bedrock Converse API; image + prompt; a forced <code>record_prescription</code> tool fixes the answer format; temperature 0).
+It understands context and shorthand, reports a confidence per item, needs no training data, runs in ≈2.5 s and costs ≈ LKR 0.33 per scan. The
+model is a setting, so it can be changed without code. <b>Alternative:</b> Amazon <b>Textract</b> (handwriting OCR) → Amazon <b>Comprehend
+Medical</b> (entity extraction) → rules. Against R1 it needs two separate services, OCR mistakes flow straight into the extraction, and Comprehend
+Medical is tuned to US clinical text and drug names, so Sri Lankan brands and shorthand (e.g. "1×2", "5/7") may be missed. Nova met R1 in one
+configurable step and was chosen; both options keep the app AWS-only.</p>
+
+<h2>3. Architecture</h2>
+<img class="arch" src="img/architecture_simple.png" alt="Architecture diagram">
+<div class="cap">Orange = external AWS service; purple dashed = simulated data; yellow = fallback. PoC runs locally; production would use one AWS
+Lightsail server. Details: docs/architecture.md.</div>
+
+<h2>4. Two connected features and their role in the workflow</h2>
+<div class="two">
+  <div><b>Feature 1 – Read the prescription (R1).</b> Upload or photograph a prescription (JPG/PNG/WEBP or PDF ≤ 3 pages). The server checks the
+  file, removes all metadata and sends it to Nova; the items appear in an editable table beside the zoomable photo. Low-confidence rows are listed
+  ("Row 2: low confidence – please verify"), each name shows its stock match and <b>pack image</b>, "Did you mean…?" chips suggest stock names,
+  and corrections are counted. <b>Fallback:</b> every AI error (not configured, unavailable, unreadable, invalid result) shows a clear message and
+  opens <b>manual entry</b>, which produces the same list.</div>
+  <div><b>Feature 2 – Check before dispensing (R2).</b> The confirmed list – from the AI or manual entry – is checked against the stock list and
+  rules: the pack to dispense (image), stock status, in-stock alternatives with the same active ingredient, interaction / duplicate-class /
+  duplicate-ingredient warnings (major → moderate → minor), unknown items flagged "not checked", strength mismatches noted, a <b>Checked</b> box per
+  item and a CSV checklist. It turns Feature 1's output into the pharmacist's dispensing decision.</div>
+</div>
+
+<h2>5. Test cases and results <span class="tag">(full log: docs/test_log.md; screenshots kept locally)</span></h2>
+<table>
+  <tr><th style="width:8%">Test</th><th style="width:22%">Input</th><th style="width:22%">Expected</th><th>Actual</th><th style="width:6%">Result</th></tr>
+  <tr><td>TC1 success</td><td>Synthetic clear prescription: Lipitor 20 mg nocte; Klacid 500 mg bd × 5/7; Panadol 500 mg tds</td>
+      <td>Items correct within 30 s; Lipitor alternative; atorvastatin + clarithromycin warning</td>
+      <td>Read in 3.0 s; all 3 items and fields correct; 0 corrections. Lipitor out of stock → Atorvastatin (generic) 20 mg; R008 moderate warning</td><td class="pass">Pass</td></tr>
+  <tr><td>TC2 messy</td><td>Redacted real Sri Lankan prescription (4 items, dense cursive)</td><td>Uncertain fields flagged → corrected → check runs</td>
+      <td>All rows flagged low; one run missed 1 item; 20 corrections; check ran – all 4 "not in stock list – check manually"</td><td class="pass">Pass</td></tr>
+  <tr><td>TC3 error</td><td>Backend with an invalid model ID</td><td>Error message → manual entry → check runs</td>
+      <td>"AI not configured … – using manual entry"; items typed and confirmed; same checklist as TC1</td><td class="pass">Pass</td></tr>
+  <tr><td>TC4</td><td>Manual entry: Warfarin 5 mg + Disprin 300 mg</td><td>Major interaction warning</td><td>R001 major: "Increased bleeding risk. Confirm with prescriber."</td><td class="pass">Pass</td></tr>
+</table>
+<p><b>Critical evaluation.</b> 82 automated tests pass (Bedrock mocked). On 9 redacted Sri Lankan prescriptions (33 items) Nova found 76% of items and
+read 52% of drug names and 42% of fields correctly, but <b>flagged 100% of the items it got wrong</b> (2.4 s/scan). Clear handwriting was read
+perfectly and repeatably (TC1); dense cursive was not, the model sometimes <b>added a duration that was not written</b> and could <b>miss an item</b>
+without a flag. Three prompt versions and the larger Nova Pro did not improve accuracy. Improvements: a pilot with more local samples, per-line
+cropping, and showing which part of the photo each field came from.</p>
+
+
+<h2>6. Feasibility assessment</h2>
+<table>
+  <tr><th style="width:13%">Factor</th><th>Assessment</th></tr>
+  <tr><td>Technical</td><td>Any browser on the pharmacy's PC or phone; one small AWS Lightsail server; Amazon Bedrock; internet needed for the AI (manual entry and the check still work).</td></tr>
+  <tr><td>Data / services</td><td>Synthetic and redacted samples only (with permission). Stock list and rules are <b>simulated</b> (34 items, 21 textbook rules – not a clinical database); real use needs the pharmacy's stock export and a reviewed interaction source.</td></tr>
+  <tr><td>Skills / time</td><td>Staff need ~2 h training; upkeep needs basic AWS skills. Built in 4 weeks; a pilot needs 2–4 more (hosting, HTTPS, login, real stock data).</td></tr>
+  <tr><td>Privacy / security</td><td>Image metadata removed; patient details ignored and never stored; least-privilege IAM (Nova only); no keys in code; images processed in the USA (no AWS region in Sri Lanka) – <b>PDPA No. 9 of 2022</b> cross-border rules for health data must be checked, and login + HTTPS added, before real use.</td></tr>
+</table>
+
+<h2>7. Itemised cost estimate (LKR; USD 1 = LKR 300) <span class="tag">– scripts/cost_estimate.py</span></h2>
+<div class="two">
+  <div><table>
+    <tr><th>One-off setup</th><th class="num">LKR</th><th>Basis</th></tr>
+    <tr><td>Devices (existing PC + phone)</td><td class="num">0</td><td>assumption</td></tr>
+    <tr><td>Installation &amp; configuration (AWS, server, HTTPS, login)</td><td class="num">15,000</td><td>assumption</td></tr>
+    <tr><td>Stock-list export / integration</td><td class="num">5,000</td><td>assumption</td></tr>
+    <tr><td>Staff training (~2 h)</td><td class="num">5,000</td><td>assumption</td></tr>
+    <tr><td>Software licences (open source)</td><td class="num">0</td><td>free</td></tr>
+    <tr><td><b>Total setup</b></td><td class="num"><b>25,000</b></td><td></td></tr>
+  </table></div>
+  <div><table>
+    <tr><th>Recurring per month</th><th class="num">LKR</th><th>Basis</th></tr>
+    <tr><td>Bedrock Nova 2 Lite – 4,500 scans (1,761 in / 179 out tokens each)</td><td class="num">1,492</td><td>measured × price</td></tr>
+    <tr><td>AWS Lightsail server (USD 7)</td><td class="num">2,100</td><td>price</td></tr>
+    <tr><td>Domain name (HTTPS certificate free)</td><td class="num">300</td><td>assumption</td></tr>
+    <tr><td>Maintenance &amp; support</td><td class="num">2,000</td><td>assumption</td></tr>
+    <tr><td><b>Total</b> (LKR 1.31 per prescription; LKR 70,700/year)</td><td class="num"><b>5,892</b></td><td></td></tr>
+  </table></div>
+</div>
+<p><b>Assumptions:</b> 150 handwritten prescriptions/day × 30 days; Nova 2 Lite USD 0.33 / 2.75 per 1M input / output tokens (verify); staff cost
+LKR 300/h. <b>Simulated vs realistic:</b> the PoC ran on a laptop with simulated stock data and cost ≈ USD 0.09 in Bedrock calls (78 scans, no free
+tier assumed); realistic use adds the server, domain, maintenance and stock integration above. <b>Affordability:</b> saving 1 minute per
+prescription [assumption, not yet measured] is worth ≈ LKR 22,500/month (net ≈ LKR 16,600; setup repaid in ≈ 1.5 months), and the running cost is
+covered by saving only <b>16 seconds per prescription</b> – affordable for one pharmacy. <b>Lower-cost alternatives:</b> Nova Lite v1 (≈ LKR 4,600/month,
+accuracy untested) or manual work (LKR 0, but no time saving and no automatic interaction check).</p>
+
+<h2>8. Benefits, limitations, risks and adoption</h2>
+<div class="two">
+  <div><p><b>Benefits:</b> fast (≈2.5 s vs 2–3 min); cheap; flags its own uncertain items; structured, auditable lists; automatic stock, alternative and
+  interaction checks; pack images help pick the right product.</p>
+  <p><b>Limitations:</b> weak on dense cursive handwriting; may add an unwritten duration or miss an item; small test set (n = 9 + synthetic);
+  simulated stock and rules; no live stock-system link; no login yet; internet required.</p></div>
+  <div><p><b>Risks → mitigations:</b> misread drug or dose → pharmacist confirms every item, flags, photo side by side, decision-support label;
+  patient-data exposure → metadata removed, nothing stored, redaction, PDPA review; AI outage → automatic manual entry; surprise bill → AWS budget alert.</p>
+  <p><b>Adoption:</b> the <b>pharmacy owner pays</b> (≈ LKR 25,000 setup + ≈ LKR 5,900/month). Start with a <b>two-week pilot</b> at the counter: the
+  dashboard records read success and corrections, and staff time prescriptions with and without the tool. <b>Main condition to proceed:</b> measured
+  accuracy and a time saving above the 16-second break-even.</p></div>
+</div>
+
+<div class="ai">
+<h1>AI Use Declaration</h1>
+<div class="meta">U.W.D.P. Amarasinghe – MS25903874 · The running app uses only Amazon Nova on Amazon Bedrock; the tools below were used to build it.
+Detailed dated log: docs/ai_use_log.md. <span class="confirm">Yellow cells: to be confirmed by the student.</span></div>
+<table>
+  <tr><th>#</th><th>AI tool</th><th>Purpose</th><th>Prompt or instruction (summary)</th><th>Output used</th><th>How the output was verified or corrected</th></tr>
+  <tr><td>1</td><td class="confirm">[confirm] e.g. Claude (claude.ai)</td><td>Topic idea and problem framing</td><td>Suggest an emerging-technology proof of concept for a community pharmacist; compare options</td><td>Choice of an AI prescription reader; Textract + Comprehend Medical as the alternative</td><td>Problem and figures confirmed in a discussion with the pharmacist (30/09/2026); alternative compared against R1/R2</td></tr>
+  <tr><td>2</td><td class="confirm">[confirm]</td><td>Week 1–2 slides, progress forms, problem statement</td><td>Draft slides and forms from my notes on the pharmacist discussion</td><td>Wording and layout of the progress documents</td><td>Edited by the student; all figures are the pharmacist's estimates, not AI-generated</td></tr>
+  <tr><td>3</td><td class="confirm">[confirm]</td><td>Simulated stock list and rules; CLAUDE.md project brief</td><td>Create a 34-item simulated stock list and textbook interaction rules; write project instructions for Claude Code</td><td>data/stock_list.csv, data/interaction_rules.csv, CLAUDE.md</td><td>Labelled SIMULATED / not a clinical database; pharmacist review requested</td></tr>
+  <tr><td>4</td><td>Claude Code (Claude Opus 5.5)</td><td>Week 1 scaffold and AWS setup guidance</td><td>"Do the Week 1 tasks in CLAUDE.md with a Spring Boot backend and Angular frontend; AWS only; no real credentials"</td><td>Repository structure, configuration, status page, model-access check; IAM least-privilege policy and budget steps</td><td>App started; tests passed; git checked for secrets; student followed the AWS steps and the access check returned OK</td></tr>
+  <tr><td>5</td><td>Claude Code</td><td>Feature 1 – reading the prescription</td><td>Build CLAUDE.md §6: image checks, Nova Converse call with a forced tool, retry, error mapping, name check, editable UI with fallback; PDF upload; dashboard</td><td>ImageUtils, Extractor, NameCheck, error types, scan page, dashboard, history, settings</td><td>JUnit tests with a mocked Bedrock client; real scans; UI checked in headless Chrome; defects found and fixed (page overflow, clipped labels, wrong error mapping)</td></tr>
+  <tr><td>6</td><td>Claude Code</td><td>Design and feasibility documents</td><td>"Architecture with a Mermaid diagram, feasibility draft, cost script; mark which numbers are assumptions and which are measured"</td><td>docs/architecture.md, docs/feasibility.md, scripts/cost_estimate.py</td><td>Diagram rendered and checked; figures cross-checked with the script output; prices and PDPA points marked "to verify"</td></tr>
+  <tr><td>7</td><td>Claude Code</td><td>Redacting real prescription photos</td><td>"Redact and save in another folder" (with the patients' permission)</td><td>Redacted Sri Lankan samples (kept locally, not on GitHub)</td><td>Only medicine lines kept; every image inspected; two leaks found and fixed; student re-checked</td></tr>
+  <tr><td>8</td><td>Claude Code</td><td>Accuracy evaluation and prompt improvement</td><td>Run a baseline, improve the prompt for Sri Lankan shorthand, compare; test Nova Pro</td><td>scripts/evaluate.py, ground truth, prompts v2/v3, docs/evaluation.md</td><td>Scoring checked offline before any API call; negative results reported (v3 and Nova Pro did not help); ground truth to be verified by the student</td></tr>
+  <tr><td>9</td><td>Claude Code</td><td>Test cases</td><td>Run TC1–TC4 through the real UI and record input, expected and actual results</td><td>docs/test_log.md and screenshots</td><td>An invalid first run (corrections prepared before seeing the AI output) was discarded and repeated; partial results reported honestly</td></tr>
+  <tr><td>10</td><td>Claude Code</td><td>Feature 2 – dispensing check and pack images</td><td>Build the CLAUDE.md Week 3 checker; "show a sample image of the suggested drug to reduce pharmacist error"</td><td>Checker, DrugImages, /api/check, checklist UI (warnings, alternatives, Checked boxes, CSV)</td><td>82 JUnit tests incl. all 8 required checker cases; TC1–TC4 passed; images labelled "pack to dispense", illustrations only (no internet images)</td></tr>
+  <tr><td>11</td><td>Claude Code</td><td>Submission readiness</td><td>Itemise costs, finish README, ZIP script, secrets scan, fresh-install test, report draft, demo script</td><td>README, make_zip.sh, report draft, demo script, this table</td><td>Whole git history scanned (no secrets); fresh clone built and tested; figures taken from the test log, evaluation and cost script; student reviewed</td></tr>
+  <tr><td>12</td><td class="confirm">[confirm]</td><td>Student's own app changes (History image store, theme toggle, tooltips, confirm dialogs, "Did you mean…?" chips)</td><td class="confirm">[tool and prompt, or "written by the student without AI"]</td><td>ImageStore, theme / tooltip / dialog components</td><td class="confirm">[e.g. reviewed, tested with ImageStoreTest]</td></tr>
+</table>
+<p><b>Responsibility:</b> the student reviewed the AI-generated code and documents, ran the tests and checked the outputs above. AI output was not
+accepted unchecked; where it was wrong it was corrected.</p>
+</div>
+
+</body>
+</html>

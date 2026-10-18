@@ -1,0 +1,35 @@
+item_id,brand_name,generic_name,strength,dosage_form,therapeutic_class,in_stock,quantity_on_hand
+S001,Panadol,paracetamol,500 mg,tablet,analgesic,yes,1200
+S002,Paracetamol (generic),paracetamol,500 mg,tablet,analgesic,yes,3000
+S003,Brufen,ibuprofen,400 mg,tablet,NSAID,no,0
+S004,Ibuprofen (generic),ibuprofen,400 mg,tablet,NSAID,yes,600
+S005,Voltaren,diclofenac,50 mg,tablet,NSAID,yes,300
+S006,Disprin,aspirin,300 mg,dispersible tablet,antiplatelet / analgesic,yes,200
+S007,Aspirin (generic),aspirin,75 mg,tablet,antiplatelet / analgesic,yes,900
+S008,Plavix,clopidogrel,75 mg,tablet,antiplatelet,no,0
+S009,Clopidogrel (generic),clopidogrel,75 mg,tablet,antiplatelet,yes,450
+S010,Warfarin (generic),warfarin,5 mg,tablet,anticoagulant,yes,150
+S011,Amoxil,amoxicillin,500 mg,capsule,antibiotic - penicillin,yes,400
+S012,Augmentin,co-amoxiclav,625 mg,tablet,antibiotic - penicillin,yes,120
+S013,Klacid,clarithromycin,500 mg,tablet,antibiotic - macrolide,yes,80
+S014,Zithromax,azithromycin,500 mg,tablet,antibiotic - macrolide,no,0
+S015,Azithromycin (generic),azithromycin,500 mg,tablet,antibiotic - macrolide,yes,90
+S016,Ciprobay,ciprofloxacin,500 mg,tablet,antibiotic - fluoroquinolone,yes,100
+S017,Flagyl,metronidazole,400 mg,tablet,antibiotic - nitroimidazole,yes,250
+S018,Norvasc,amlodipine,5 mg,tablet,antihypertensive - calcium channel blocker,yes,500
+S019,Cozaar,losartan,50 mg,tablet,antihypertensive - ARB,no,0
+S020,Losartan (generic),losartan,50 mg,tablet,antihypertensive - ARB,yes,700
+S021,Renitec,enalapril,5 mg,tablet,antihypertensive - ACE inhibitor,yes,300
+S022,Tenormin,atenolol,50 mg,tablet,antihypertensive - beta blocker,yes,350
+S023,Glucophage,metformin,500 mg,tablet,antidiabetic - biguanide,yes,1500
+S024,Lipitor,atorvastatin,20 mg,tablet,statin,no,0
+S025,Atorvastatin (generic),atorvastatin,20 mg,tablet,statin,yes,800
+S026,Zocor,simvastatin,20 mg,tablet,statin,yes,200
+S027,Losec,omeprazole,20 mg,capsule,proton pump inhibitor,yes,600
+S028,Nexium,esomeprazole,20 mg,tablet,proton pump inhibitor,yes,150
+S029,Motilium,domperidone,10 mg,tablet,antiemetic,yes,400
+S030,Clarityne,loratadine,10 mg,tablet,antihistamine,yes,250
+S031,Zyrtec,cetirizine,10 mg,tablet,antihistamine,yes,300
+S032,Piriton,chlorphenamine,4 mg,tablet,antihistamine,yes,500
+S033,Prednisolone (generic),prednisolone,5 mg,tablet,corticosteroid,yes,400
+S034,Ventolin,salbutamol,100 mcg/dose,inhaler,bronchodilator,yes,40

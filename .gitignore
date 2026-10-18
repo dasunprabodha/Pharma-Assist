@@ -1,0 +1,51 @@
+# Secrets - never commit
+.env
+.env.*
+!.env.example
+*.pem
+.aws/
+
+# Runtime output
+logs/*
+!logs/.gitkeep
+
+# Private / real samples must never be committed
+samples/private/
+
+# Backend (Maven)
+backend/target/
+
+# Frontend (Angular)
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Student's own coursework documents (kept locally, not part of the source)
+/*.pdf
+/*.docx
+/*.pptx
+/CLAUDE(1).md
+
+# AWS CLI installer leftovers
+/aws/
+/awscliv2.zip
+
+# Real (dataset) prescription images - not synthetic, keep out of the public repo
+/Samples Prescriptions/
+/Samples Sri Lanka/
+
+# Python bytecode
+__pycache__/
+
+# Redacted Sri Lankan samples and screenshots showing them - local only, not for GitHub
+/samples/sri_lanka/
+/docs/screenshots/
+
+# Built submission ZIP
+/submission/

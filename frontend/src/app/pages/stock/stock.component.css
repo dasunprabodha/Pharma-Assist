@@ -1,0 +1,8 @@
+.toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.search { position: relative; flex: 1; min-width: 200px; max-width: 360px; display: flex; }
+.search app-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.search .input { width: 100%; padding-left: 32px; }
+.check { display: inline-flex; align-items: center; gap: 6px; color: var(--text-secondary); cursor: pointer; }
+.push { margin-left: auto; }
+.center { text-align: center; padding: 20px !important; }
+td .badge { text-transform: capitalize; }
