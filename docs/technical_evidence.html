@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Technical Evidence – Prescription Reader (MS25903874)</title>
 <!-- Print to PDF: A4, default margins, "Background graphics" on. Must stay within 4 pages:
-     pages 1-2 solution evidence, pages 3-4 AI use declaration. Yellow [confirm] cells must be completed by the student. -->
+     pages 1-2 solution evidence, pages 3-4 AI use declaration. -->
 <style>
   @page { size: A4; margin: 11mm 11mm 12mm 11mm; }
   * { box-sizing: border-box; }
@@ -28,14 +28,13 @@
   .ai { page-break-before: always; }
   .ai table { font-size: 7.2pt; }
   .ai td:nth-child(1) { width: 2.5%; } .ai td:nth-child(2) { width: 11%; } .ai td:nth-child(3) { width: 14%; }
-  .confirm { background: #fff3b0; }
   b.k { color: #1c5cab; }
 </style>
 </head>
 <body>
 
 <h1>Prescription Reader – AI-assisted prescription reading and dispensing check</h1>
-<div class="meta">IT6070 Emerging Topics in IT · Assignment II · <b>U.W.D.P. Amarasinghe – MS25903874</b> · Technical evidence · 18/10/2026 ·
+<div class="meta">IT6070 Emerging Topics in IT · Assignment II · <b>U.W.D.P. Amarasinghe – MS25903874</b> · Technical evidence · 22/10/2026 ·
 Repository: <b>github.com/dasunprabodha/Assignment-2</b></div>
 
 <h2>1. Professional and problem</h2>
@@ -149,12 +148,12 @@ accuracy untested) or manual work (LKR 0, but no time saving and no automatic in
 <div class="ai">
 <h1>AI Use Declaration</h1>
 <div class="meta">U.W.D.P. Amarasinghe – MS25903874 · The running app uses only Amazon Nova on Amazon Bedrock; the tools below were used to build it.
-Detailed dated log: docs/ai_use_log.md. <span class="confirm">Yellow cells: to be confirmed by the student.</span></div>
+Detailed dated log: docs/ai_use_log.md.</div>
 <table>
   <tr><th>#</th><th>AI tool</th><th>Purpose</th><th>Prompt or instruction (summary)</th><th>Output used</th><th>How the output was verified or corrected</th></tr>
-  <tr><td>1</td><td class="confirm">[confirm] e.g. Claude (claude.ai)</td><td>Topic idea and problem framing</td><td>Suggest an emerging-technology proof of concept for a community pharmacist; compare options</td><td>Choice of an AI prescription reader; Textract + Comprehend Medical as the alternative</td><td>Problem and figures confirmed in a discussion with the pharmacist (30/09/2026); alternative compared against R1/R2</td></tr>
-  <tr><td>2</td><td class="confirm">[confirm]</td><td>Week 1–2 slides, progress forms, problem statement</td><td>Draft slides and forms from my notes on the pharmacist discussion</td><td>Wording and layout of the progress documents</td><td>Edited by the student; all figures are the pharmacist's estimates, not AI-generated</td></tr>
-  <tr><td>3</td><td class="confirm">[confirm]</td><td>Simulated stock list and rules; CLAUDE.md project brief</td><td>Create a 34-item simulated stock list and textbook interaction rules; write project instructions for Claude Code</td><td>data/stock_list.csv, data/interaction_rules.csv, CLAUDE.md</td><td>Labelled SIMULATED / not a clinical database; pharmacist review requested</td></tr>
+  <tr><td>1</td><td>Claude (claude.ai chat)</td><td>Topic idea and problem framing</td><td>Suggest an emerging-technology proof of concept for a community pharmacist; compare options</td><td>Choice of an AI prescription reader; Textract + Comprehend Medical as the alternative</td><td>Problem and figures confirmed in a discussion with the pharmacist (30/09/2026); alternative compared against R1/R2</td></tr>
+  <tr><td>2</td><td>Claude Code (Claude Opus 5.5)</td><td>Progress forms and presentations</td><td>"Fill the Week 2–4 progress forms"; "update the Week 1 slides"; "give 2 PDFs and a presentation"</td><td>Week 2–4 forms, updated Week 1 slides, submission PDFs, final deck</td><td>Figures copied from the test log, evaluation and cost script; checked page by page; reviewed by the student. The <b>original</b> Week 1 slides and problem statement were written <b>without AI</b></td></tr>
+  <tr><td>3</td><td>Claude (claude.ai chat)</td><td>Simulated stock list and rules; CLAUDE.md project brief</td><td>Create a 34-item simulated stock list and textbook interaction rules; write project instructions for Claude Code</td><td>data/stock_list.csv, data/interaction_rules.csv, CLAUDE.md</td><td>Labelled SIMULATED / not a clinical database; pharmacist review requested</td></tr>
   <tr><td>4</td><td>Claude Code (Claude Opus 5.5)</td><td>Week 1 scaffold and AWS setup guidance</td><td>"Do the Week 1 tasks in CLAUDE.md with a Spring Boot backend and Angular frontend; AWS only; no real credentials"</td><td>Repository structure, configuration, status page, model-access check; IAM least-privilege policy and budget steps</td><td>App started; tests passed; git checked for secrets; student followed the AWS steps and the access check returned OK</td></tr>
   <tr><td>5</td><td>Claude Code</td><td>Feature 1 – reading the prescription</td><td>Build CLAUDE.md §6: image checks, Nova Converse call with a forced tool, retry, error mapping, name check, editable UI with fallback; PDF upload; dashboard</td><td>ImageUtils, Extractor, NameCheck, error types, scan page, dashboard, history, settings</td><td>JUnit tests with a mocked Bedrock client; real scans; UI checked in headless Chrome; defects found and fixed (page overflow, clipped labels, wrong error mapping)</td></tr>
   <tr><td>6</td><td>Claude Code</td><td>Design and feasibility documents</td><td>"Architecture with a Mermaid diagram, feasibility draft, cost script; mark which numbers are assumptions and which are measured"</td><td>docs/architecture.md, docs/feasibility.md, scripts/cost_estimate.py</td><td>Diagram rendered and checked; figures cross-checked with the script output; prices and PDPA points marked "to verify"</td></tr>
@@ -163,7 +162,7 @@ Detailed dated log: docs/ai_use_log.md. <span class="confirm">Yellow cells: to b
   <tr><td>9</td><td>Claude Code</td><td>Test cases</td><td>Run TC1–TC4 through the real UI and record input, expected and actual results</td><td>docs/test_log.md and screenshots</td><td>An invalid first run (corrections prepared before seeing the AI output) was discarded and repeated; partial results reported honestly</td></tr>
   <tr><td>10</td><td>Claude Code</td><td>Feature 2 – dispensing check and pack images</td><td>Build the CLAUDE.md Week 3 checker; "show a sample image of the suggested drug to reduce pharmacist error"</td><td>Checker, DrugImages, /api/check, checklist UI (warnings, alternatives, Checked boxes, CSV)</td><td>82 JUnit tests incl. all 8 required checker cases; TC1–TC4 passed; images labelled "pack to dispense", illustrations only (no internet images)</td></tr>
   <tr><td>11</td><td>Claude Code</td><td>Submission readiness</td><td>Itemise costs, finish README, ZIP script, secrets scan, fresh-install test, report draft, demo script</td><td>README, make_zip.sh, report draft, demo script, this table</td><td>Whole git history scanned (no secrets); fresh clone built and tested; figures taken from the test log, evaluation and cost script; student reviewed</td></tr>
-  <tr><td>12</td><td class="confirm">[confirm]</td><td>Student's own app changes (History image store, theme toggle, tooltips, confirm dialogs, "Did you mean…?" chips)</td><td class="confirm">[tool and prompt, or "written by the student without AI"]</td><td>ImageStore, theme / tooltip / dialog components</td><td class="confirm">[e.g. reviewed, tested with ImageStoreTest]</td></tr>
+  <tr><td>12</td><td>Claude Code (Claude Opus 5.5)</td><td>UI refinements and History image (opt-in)</td><td>"Add tooltips and a dark theme"; "add 'Did you mean…?' suggestions, warn before losing work"; "in History, show the image"</td><td>Tooltips, theme, confirm dialogs, image viewer, NameCheck.suggest, ImageStore</td><td>ng build clean; ImageStoreTest (write on confirm only, timeout, retention, unsafe IDs); headless-Chrome checks</td></tr>
 </table>
 <p><b>Responsibility:</b> the student reviewed the AI-generated code and documents, ran the tests and checked the outputs above. AI output was not
 accepted unchecked; where it was wrong it was corrected.</p>
