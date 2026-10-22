@@ -67,8 +67,8 @@ or the prescriber to confirm. (Figures are the pharmacist's estimates from a dis
 ## Installation
 
 ```bash
-git clone <repository-url>
-cd <repository>
+git clone https://github.com/dasunprabodha/Assignment-2.git
+cd Assignment-2
 
 # Backend dependencies + tests
 cd backend
